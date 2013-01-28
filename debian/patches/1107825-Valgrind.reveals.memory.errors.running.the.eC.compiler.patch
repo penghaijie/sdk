@@ -1,0 +1,126 @@
+From 15ba79c481f7e7bde4a28a5537ea78b02d8e566a Mon Sep 17 00:00:00 2001
+From: Jerome St-Louis <jerome@ecere.com>
+Date: Mon, 19 Nov 2012 07:38:19 -0500
+Subject: [PATCH 04/14] Fixed bad memory access in lexer/compiler showing up
+ in Valgrind
+
+---
+ compiler/bootstrap/libec/bootstrap/lexer.c  |   10 ++++++----
+ compiler/bootstrap/libec/bootstrap/pass15.c |    2 +-
+ compiler/libec/src/lexer.ec                 |    4 ++--
+ compiler/libec/src/lexer.l                  |    3 ++-
+ compiler/libec/src/pass15.ec                |    2 +-
+ 5 files changed, 12 insertions(+), 9 deletions(-)
+
+diff --git a/compiler/bootstrap/libec/bootstrap/lexer.c b/compiler/bootstrap/libec/bootstrap/lexer.c
+index f86bc1c..4c58944 100644
+--- a/compiler/bootstrap/libec/bootstrap/lexer.c
++++ b/compiler/bootstrap/libec/bootstrap/lexer.c
+@@ -2090,14 +2090,12 @@ yy_flex_free((void *)(*b).yy_ch_buf);
+ yy_flex_free((void *)b);
+ }
+ 
+-extern int isatty(int);
+-
+ void yy_init_buffer(YY_BUFFER_STATE b, FILE * file)
+ {
+ yy_flush_buffer(b);
+ (*b).yy_input_file = file;
+ (*b).yy_fill_buffer = 1;
+-(*b).yy_is_interactive = file ? (isatty(fileno(file)) > 0) : 0;
++(*b).yy_is_interactive = 0;
+ }
+ 
+ void yy_flush_buffer(YY_BUFFER_STATE b)
+@@ -2271,6 +2269,10 @@ extern char *  __ecereNameSpace__ecere__sys__TrimLSpaces(char *  string, char *
+ 
+ extern int strncmp(const char * , const char * , int n);
+ 
++extern void *  memmove(void * , const void * , unsigned int size);
++
++extern int strlen(const char * );
++
+ extern char *  strncpy(char * , const char * , int n);
+ 
+ extern char *  __ecereNameSpace__ecere__GetTranslatedString(struct __ecereNameSpace__ecere__com__Instance * module, char *  string, char *  stringAndContext);
+@@ -2365,7 +2367,7 @@ if(!strncmp(line, "include", c))
+ {
+ char includeFile[797] = "";
+ 
+-strcpy(line, line + c);
++memmove(line, line + c, strlen(line + c) + 1);
+ __ecereNameSpace__ecere__sys__TrimLSpaces(line, line);
+ if(line[0] == '\"')
+ {
+diff --git a/compiler/bootstrap/libec/bootstrap/pass15.c b/compiler/bootstrap/libec/bootstrap/pass15.c
+index 0bb9d2d..75e8d50 100644
+--- a/compiler/bootstrap/libec/bootstrap/pass15.c
++++ b/compiler/bootstrap/libec/bootstrap/pass15.c
+@@ -1462,7 +1462,7 @@ if(!symbol && ((!id->_class || (id->_class->name && !strcmp(id->_class->name, "p
+ struct __ecereNameSpace__ecere__com__Property * prop = __ecereNameSpace__ecere__com__eClass_FindProperty(_class, id->string, privateModule);
+ struct __ecereNameSpace__ecere__com__Method * method = (((void *)0));
+ struct __ecereNameSpace__ecere__com__DataMember * member = (((void *)0));
+-struct __ecereNameSpace__ecere__com__ClassProperty * classProp;
++struct __ecereNameSpace__ecere__com__ClassProperty * classProp = (((void *)0));
+ 
+ if(!prop)
+ {
+diff --git a/compiler/libec/src/lexer.ec b/compiler/libec/src/lexer.ec
+index a420f51..58c0a0a 100644
+--- a/compiler/libec/src/lexer.ec
++++ b/compiler/libec/src/lexer.ec
+@@ -1200,7 +1200,7 @@ char *yytext;
+ #line 10 "lexer.l"
+ import "ecdefs"
+ #define YYLTYPE Location
+-
++#define YY_NEVER_INTERACTIVE 1    // Avoid calling isatty on eC File object
+ #include "grammar.h"
+ 
+ bool echoOn = true;
+@@ -3400,7 +3400,7 @@ int preprocessor()
+    {
+       char includeFile[MAX_LOCATION] = "";
+ 
+-      strcpy(line, line+c);
++      memmove(line, line+c, strlen(line+c)+1);
+       TrimLSpaces(line, line);
+       if(line[0] == '\"')
+       {
+diff --git a/compiler/libec/src/lexer.l b/compiler/libec/src/lexer.l
+index 043db65..51121dd 100644
+--- a/compiler/libec/src/lexer.l
++++ b/compiler/libec/src/lexer.l
+@@ -9,6 +9,7 @@ IDENT    {L}({L}|{D})*
+ %{
+ import "ecdefs"
+ #define YYLTYPE Location
++#define YY_NEVER_INTERACTIVE 1    // Avoid calling isatty on eC File object
+ 
+ #include "grammar.h"
+ 
+@@ -448,7 +449,7 @@ int preprocessor()
+    {
+       char includeFile[MAX_LOCATION] = "";
+ 
+-      strcpy(line, line+c);
++      memmove(line, line+c, strlen(line+c)+1);
+       TrimLSpaces(line, line);
+       if(line[0] == '\"')
+       {
+diff --git a/compiler/libec/src/pass15.ec b/compiler/libec/src/pass15.ec
+index f328b3a..302a922 100644
+--- a/compiler/libec/src/pass15.ec
++++ b/compiler/libec/src/pass15.ec
+@@ -242,7 +242,7 @@ static void ReplaceClassMembers(Expression exp, Class _class)
+          Property prop = eClass_FindProperty(_class, id.string, privateModule);
+          Method method = null;
+          DataMember member = null;
+-         ClassProperty classProp;
++         ClassProperty classProp = null;
+          if(!prop)
+          {
+             method = eClass_FindMethod(_class, id.string, privateModule);
+-- 
+1.7.9.5
+

@@ -1,0 +1,661 @@
+From 4b805c2e2f51275d561dcb0bc4ad15463db4d467 Mon Sep 17 00:00:00 2001
+From: Jerome St-Louis <jerome@ecere.com>
+Date: Mon, 28 Jan 2013 00:54:48 -0500
+Subject: [PATCH 03/14] Fixed builds on ARM by disabling forcing -m32 - Made
+ forcing bit depth (on eC files) optional
+
+---
+ compiler/bootstrap/ecc/Makefile         |    4 ++--
+ compiler/bootstrap/ecere/Makefile       |    2 +-
+ compiler/bootstrap/ecp/Makefile         |    4 ++--
+ compiler/bootstrap/ecs/Makefile         |    4 ++--
+ compiler/bootstrap/libec/Makefile       |    2 +-
+ compiler/ecc/Makefile                   |    4 ++--
+ compiler/ecp/Makefile                   |    4 ++--
+ compiler/ecs/Makefile                   |    4 ++--
+ compiler/libec/Makefile                 |    6 +++---
+ crossplatform.mk                        |   13 +++++++++++++
+ deps/freetype-2.3.12/Makefile           |    2 +-
+ deps/jpeg-6b/Makefile                   |    2 +-
+ deps/libpng-1.4.0/Makefile              |    2 +-
+ deps/libungif-4.1.1/Makefile            |    2 +-
+ deps/zlib/Makefile                      |    2 +-
+ documentor/Makefile                     |    4 ++--
+ ear/cmd/Makefile                        |    4 ++--
+ ear/extract/Makefile                    |    4 ++--
+ ecere/Makefile                          |    4 ++--
+ ecere/Makefile.ecereCOM                 |    4 ++--
+ ecere/Makefile.vanilla                  |    2 +-
+ eda/drivers/sqlite/Makefile             |    4 ++--
+ eda/drivers/sqliteCipher/Makefile       |    4 ++--
+ eda/libeda/Makefile                     |    4 ++--
+ epj2make/Makefile                       |    4 ++--
+ ide/Makefile                            |    4 ++--
+ ide/src/IDESettings.ec                  |   10 ++++++++++
+ ide/src/dialogs/GlobalSettingsDialog.ec |   19 +++++++++++++++++++
+ ide/src/project/Project.ec              |    6 ++++--
+ ide/src/project/ProjectConfig.ec        |    1 +
+ include.mk                              |    8 ++++++++
+ 31 files changed, 98 insertions(+), 45 deletions(-)
+
+diff --git a/compiler/bootstrap/ecc/Makefile b/compiler/bootstrap/ecc/Makefile
+index 2b66a4d..e41e136 100644
+--- a/compiler/bootstrap/ecc/Makefile
++++ b/compiler/bootstrap/ecc/Makefile
+@@ -34,14 +34,14 @@ include ../../../include.mk
+ 
+ # FLAGS
+ 
+-CFLAGS += -fmessage-length=0 -O2 -ffast-math -m32 $(FPIC) -w \
++CFLAGS += -fmessage-length=0 -O2 -ffast-math $(FORCE_32_BIT) $(FPIC) -w \
+ 	 -DECERE_STATIC
+ 
+ CECFLAGS =
+ 
+ ECFLAGS = -nolinenumbers
+ 
+-OFLAGS += -m32 \
++OFLAGS += $(FORCE_32_BIT) \
+ 	 -L../ecere/obj/bootstrap.$(PLATFORM) \
+ 	 -L../libec/obj/bootstrap.$(PLATFORM)
+ 
+diff --git a/compiler/bootstrap/ecere/Makefile b/compiler/bootstrap/ecere/Makefile
+index e1b4cdb..b6297c1 100644
+--- a/compiler/bootstrap/ecere/Makefile
++++ b/compiler/bootstrap/ecere/Makefile
+@@ -80,7 +80,7 @@ include ../../../include.mk
+ 
+ # FLAGS
+ 
+-CFLAGS += -fmessage-length=0 -O2 -ffast-math -m32 $(FPIC) -w \
++CFLAGS += -fmessage-length=0 -O2 -ffast-math $(FORCE_32_BIT) $(FPIC) -w \
+ 	 -DBUILDING_ECERE_COM -DECERE_STATIC -DECERE_BOOTSTRAP
+ 
+ CECFLAGS =
+diff --git a/compiler/bootstrap/ecp/Makefile b/compiler/bootstrap/ecp/Makefile
+index 6988534..b08b9f0 100644
+--- a/compiler/bootstrap/ecp/Makefile
++++ b/compiler/bootstrap/ecp/Makefile
+@@ -34,14 +34,14 @@ include ../../../include.mk
+ 
+ # FLAGS
+ 
+-CFLAGS += -fmessage-length=0 -O2 -ffast-math -m32 $(FPIC) -w \
++CFLAGS += -fmessage-length=0 -O2 -ffast-math $(FORCE_32_BIT) $(FPIC) -w \
+ 	 -DECERE_STATIC
+ 
+ CECFLAGS =
+ 
+ ECFLAGS = -nolinenumbers
+ 
+-OFLAGS += -m32 \
++OFLAGS += $(FORCE_32_BIT) \
+ 	 -L../ecere/obj/bootstrap.$(PLATFORM) \
+ 	 -L../libec/obj/bootstrap.$(PLATFORM)
+ 
+diff --git a/compiler/bootstrap/ecs/Makefile b/compiler/bootstrap/ecs/Makefile
+index 5b37a6b..129af76 100644
+--- a/compiler/bootstrap/ecs/Makefile
++++ b/compiler/bootstrap/ecs/Makefile
+@@ -34,14 +34,14 @@ include ../../../include.mk
+ 
+ # FLAGS
+ 
+-CFLAGS += -fmessage-length=0 -O2 -ffast-math -m32 $(FPIC) -w \
++CFLAGS += -fmessage-length=0 -O2 -ffast-math $(FORCE_32_BIT) $(FPIC) -w \
+ 	 -DECERE_STATIC
+ 
+ CECFLAGS =
+ 
+ ECFLAGS = -nolinenumbers
+ 
+-OFLAGS += -m32 \
++OFLAGS += $(FORCE_32_BIT) \
+ 	 -L../ecere/obj/bootstrap.$(PLATFORM) \
+ 	 -L../libec/obj/bootstrap.$(PLATFORM)
+ 
+diff --git a/compiler/bootstrap/libec/Makefile b/compiler/bootstrap/libec/Makefile
+index 93e8294..8394782 100644
+--- a/compiler/bootstrap/libec/Makefile
++++ b/compiler/bootstrap/libec/Makefile
+@@ -70,7 +70,7 @@ include ../../../include.mk
+ 
+ # FLAGS
+ 
+-CFLAGS += -fmessage-length=0 -O2 -ffast-math -m32 $(FPIC) -w \
++CFLAGS += -fmessage-length=0 -O2 -ffast-math $(FORCE_32_BIT) $(FPIC) -w \
+ 	 -DYYTOKENTYPE -DECERE_STATIC
+ 
+ CECFLAGS =
+diff --git a/compiler/ecc/Makefile b/compiler/ecc/Makefile
+index 55e0cf2..c0def29 100644
+--- a/compiler/ecc/Makefile
++++ b/compiler/ecc/Makefile
+@@ -55,13 +55,13 @@ EAR := $(call psep,../../obj/$(PLATFORM)/bin/ear)
+ 
+ # FLAGS
+ 
+-CFLAGS += -fmessage-length=0 -O2 -ffast-math -m32 $(FPIC) -w
++CFLAGS += -fmessage-length=0 -O2 -ffast-math $(FORCE_32_BIT) $(FPIC) -w
+ 
+ CECFLAGS =
+ 
+ ECFLAGS = -nolinenumbers
+ 
+-OFLAGS += -m32 \
++OFLAGS += $(FORCE_32_BIT) \
+ 	 -L../../obj/$(PLATFORM)/bin \
+ 	 -L../../obj/$(PLATFORM)/lib
+ 
+diff --git a/compiler/ecp/Makefile b/compiler/ecp/Makefile
+index 44cbace..73c4b8e 100644
+--- a/compiler/ecp/Makefile
++++ b/compiler/ecp/Makefile
+@@ -55,13 +55,13 @@ EAR := $(call psep,../../obj/$(PLATFORM)/bin/ear)
+ 
+ # FLAGS
+ 
+-CFLAGS += -fmessage-length=0 -O2 -ffast-math -m32 $(FPIC) -w
++CFLAGS += -fmessage-length=0 -O2 -ffast-math $(FORCE_32_BIT) $(FPIC) -w
+ 
+ CECFLAGS =
+ 
+ ECFLAGS = -nolinenumbers
+ 
+-OFLAGS += -m32 \
++OFLAGS += $(FORCE_32_BIT) \
+ 	 -L../../obj/$(PLATFORM)/bin \
+ 	 -L../../obj/$(PLATFORM)/lib
+ 
+diff --git a/compiler/ecs/Makefile b/compiler/ecs/Makefile
+index 87c7152..05e6999 100644
+--- a/compiler/ecs/Makefile
++++ b/compiler/ecs/Makefile
+@@ -55,13 +55,13 @@ EAR := $(call psep,../../obj/$(PLATFORM)/bin/ear)
+ 
+ # FLAGS
+ 
+-CFLAGS += -fmessage-length=0 -O2 -ffast-math -m32 $(FPIC) -w
++CFLAGS += -fmessage-length=0 -O2 -ffast-math $(FORCE_32_BIT) $(FPIC) -w
+ 
+ CECFLAGS =
+ 
+ ECFLAGS = -nolinenumbers
+ 
+-OFLAGS += -m32 \
++OFLAGS += $(FORCE_32_BIT) \
+ 	 -L../../obj/$(PLATFORM)/bin \
+ 	 -L../../obj/$(PLATFORM)/lib
+ 
+diff --git a/compiler/libec/Makefile b/compiler/libec/Makefile
+index 603f3c4..15c48b0 100644
+--- a/compiler/libec/Makefile
++++ b/compiler/libec/Makefile
+@@ -157,15 +157,15 @@ EAR := $(call psep,../../obj/$(PLATFORM)/bin/ear)
+ # FLAGS
+ 
+ # BSL CFLAGS
+-BSL_CFLAGS = -fmessage-length=0 -O2 -ffast-math -m32 $(FPIC) -w
++BSL_CFLAGS = -fmessage-length=0 -O2 -ffast-math $(FORCE_32_BIT) $(FPIC) -w
+ 
+-CFLAGS += -fmessage-length=0 -O2 -ffast-math -m32 $(FPIC) -w -I../bootstrap/include
++CFLAGS += -fmessage-length=0 -O2 -ffast-math $(FORCE_32_BIT) $(FPIC) -w -I../bootstrap/include
+ 
+ CECFLAGS =
+ 
+ ECFLAGS = -nolinenumbers
+ 
+-OFLAGS += -m32 \
++OFLAGS += $(FORCE_32_BIT) \
+ 	 -L../../obj/$(PLATFORM)/bin \
+ 	 -L../../obj/$(PLATFORM)/lib
+ 
+diff --git a/crossplatform.mk b/crossplatform.mk
+index 6d1ee34..27c425c 100644
+--- a/crossplatform.mk
++++ b/crossplatform.mk
+@@ -11,6 +11,19 @@ else
+    LINUX = defined
+ endif
+ endif
++
++UNAME_P := $(shell uname -p)
++ifeq ($(UNAME_P),x86_64)
++  HOST_ARCH = X64
++else
++ifneq ($(filter %86,$(UNAME_P)),)
++  HOST_ARCH = X86
++else
++ifneq ($(filter arm%,$(UNAME_P)),)
++  HOST_ARCH = ARM
++endif
++endif
++endif
+ endif
+ 
+ # PLATFORM (TARGET)
+diff --git a/deps/freetype-2.3.12/Makefile b/deps/freetype-2.3.12/Makefile
+index 348fbf2..baa278e 100644
+--- a/deps/freetype-2.3.12/Makefile
++++ b/deps/freetype-2.3.12/Makefile
+@@ -125,7 +125,7 @@ include ../../include.mk
+ # FLAGS
+ 
+ # Warning: Compiling with -O2 gives 0 font height with MinGW!!
+-CFLAGS += -fmessage-length=0 -m32 $(FPIC) -w \
++CFLAGS += -fmessage-length=0 $(FORCE_32_BIT) $(FPIC) -w \
+ 	 -DFT2_BUILD_LIBRARY -DFT_OPTION_AUTOFIT2 \
+ 	 -I../zlib \
+ 	 -Iinclude \
+diff --git a/deps/jpeg-6b/Makefile b/deps/jpeg-6b/Makefile
+index d7133fd..efc0e4b 100644
+--- a/deps/jpeg-6b/Makefile
++++ b/deps/jpeg-6b/Makefile
+@@ -134,7 +134,7 @@ include ../../include.mk
+ 
+ # FLAGS
+ 
+-CFLAGS += -fmessage-length=0 -O2 -ffast-math -m32 $(FPIC) -w
++CFLAGS += -fmessage-length=0 -O2 -ffast-math $(FORCE_32_BIT) $(FPIC) -w
+ 
+ LIBS = $(SHAREDLIB) $(EXECUTABLE) $(LINKOPT)
+ 
+diff --git a/deps/libpng-1.4.0/Makefile b/deps/libpng-1.4.0/Makefile
+index abcc5e9..f667f16 100644
+--- a/deps/libpng-1.4.0/Makefile
++++ b/deps/libpng-1.4.0/Makefile
+@@ -66,7 +66,7 @@ include ../../include.mk
+ 
+ # FLAGS
+ 
+-CFLAGS += -fmessage-length=0 -O2 -ffast-math -m32 $(FPIC) -w \
++CFLAGS += -fmessage-length=0 -O2 -ffast-math $(FORCE_32_BIT) $(FPIC) -w \
+ 	 -I. \
+ 	 -I../zlib
+ 
+diff --git a/deps/libungif-4.1.1/Makefile b/deps/libungif-4.1.1/Makefile
+index 4264a90..1fd4399 100644
+--- a/deps/libungif-4.1.1/Makefile
++++ b/deps/libungif-4.1.1/Makefile
+@@ -42,7 +42,7 @@ include ../../include.mk
+ 
+ # FLAGS
+ 
+-CFLAGS += -fmessage-length=0 -O2 -ffast-math -m32 $(FPIC) -w
++CFLAGS += -fmessage-length=0 -O2 -ffast-math $(FORCE_32_BIT) $(FPIC) -w
+ 
+ LIBS = $(SHAREDLIB) $(EXECUTABLE) $(LINKOPT)
+ 
+diff --git a/deps/zlib/Makefile b/deps/zlib/Makefile
+index 475e35b..fedb101 100644
+--- a/deps/zlib/Makefile
++++ b/deps/zlib/Makefile
+@@ -60,7 +60,7 @@ include ../../include.mk
+ 
+ # FLAGS
+ 
+-CFLAGS += -fmessage-length=0 -O2 -ffast-math -m32 $(FPIC) -w
++CFLAGS += -fmessage-length=0 -O2 -ffast-math $(FORCE_32_BIT) $(FPIC) -w
+ 
+ LIBS = $(SHAREDLIB) $(EXECUTABLE) $(LINKOPT)
+ 
+diff --git a/documentor/Makefile b/documentor/Makefile
+index 921b33e..4397274 100644
+--- a/documentor/Makefile
++++ b/documentor/Makefile
+@@ -95,13 +95,13 @@ EAR := $(call psep,../obj/$(PLATFORM)/bin/ear)
+ 
+ # FLAGS
+ 
+-CFLAGS += -fmessage-length=0 -O2 -ffast-math -m32 $(FPIC) -w
++CFLAGS += -fmessage-length=0 -O2 -ffast-math $(FORCE_32_BIT) $(FPIC) -w
+ 
+ CECFLAGS =
+ 
+ ECFLAGS = -nolinenumbers
+ 
+-OFLAGS += -m32 \
++OFLAGS += $(FORCE_32_BIT) \
+ 	 -L../obj/$(PLATFORM)/bin \
+ 	 -L../obj/$(PLATFORM)/lib
+ 
+diff --git a/ear/cmd/Makefile b/ear/cmd/Makefile
+index 47e6995..0d27bf7 100644
+--- a/ear/cmd/Makefile
++++ b/ear/cmd/Makefile
+@@ -55,13 +55,13 @@ EAR := $(call psep,../../obj/$(PLATFORM)/bin/ear)
+ 
+ # FLAGS
+ 
+-CFLAGS += -fmessage-length=0 -O2 -ffast-math -m32 $(FPIC) -w
++CFLAGS += -fmessage-length=0 -O2 -ffast-math $(FORCE_32_BIT) $(FPIC) -w
+ 
+ CECFLAGS =
+ 
+ ECFLAGS = -nolinenumbers
+ 
+-OFLAGS += -m32 \
++OFLAGS += $(FORCE_32_BIT) \
+ 	 -L../../obj/$(PLATFORM)/bin \
+ 	 -L../../obj/$(PLATFORM)/lib
+ 
+diff --git a/ear/extract/Makefile b/ear/extract/Makefile
+index cf91cdf..fff217c 100644
+--- a/ear/extract/Makefile
++++ b/ear/extract/Makefile
+@@ -82,14 +82,14 @@ EAR := $(call psep,../../obj/$(PLATFORM)/bin/ear)
+ 
+ # FLAGS
+ 
+-CFLAGS += -fmessage-length=0 -Os -m32 $(FPIC) -w \
++CFLAGS += -fmessage-length=0 -Os $(FORCE_32_BIT) $(FPIC) -w \
+ 	 -DECERE_STATIC
+ 
+ CECFLAGS =
+ 
+ ECFLAGS = -nolinenumbers
+ 
+-OFLAGS += -m32 \
++OFLAGS += $(FORCE_32_BIT) \
+ 	 -L../../ecere/obj/vanilla.$(PLATFORM) \
+ 	 -L../../deps/zlib/obj/release.$(PLATFORM)
+ 
+diff --git a/ecere/Makefile b/ecere/Makefile
+index 86e4676..d886ade 100644
+--- a/ecere/Makefile
++++ b/ecere/Makefile
+@@ -845,7 +845,7 @@ EAR := $(call psep,../obj/$(PLATFORM)/bin/ear)
+ 
+ # FLAGS
+ 
+-CFLAGS += -fmessage-length=0 -O2 -ffast-math -m32 $(FPIC) -w \
++CFLAGS += -fmessage-length=0 -O2 -ffast-math $(FORCE_32_BIT) $(FPIC) -w \
+ 	 -DBUILDING_ECERE_COM \
+ 	 -Isrc/gfx/drivers/harfbuzz
+ 
+@@ -853,7 +853,7 @@ CECFLAGS =
+ 
+ ECFLAGS = -nolinenumbers -defaultns ecere
+ 
+-OFLAGS += -m32
++OFLAGS += $(FORCE_32_BIT)
+ 
+ LIBS = -ljpeg -lpng -lz -lfreetype $(SHAREDLIB) $(EXECUTABLE) $(LINKOPT)
+ 
+diff --git a/ecere/Makefile.ecereCOM b/ecere/Makefile.ecereCOM
+index 027f8d1..87ba347 100644
+--- a/ecere/Makefile.ecereCOM
++++ b/ecere/Makefile.ecereCOM
+@@ -132,14 +132,14 @@ EAR := $(call psep,../obj/$(PLATFORM)/bin/ear)
+ 
+ # FLAGS
+ 
+-CFLAGS += -fmessage-length=0 -O2 -ffast-math -m32 $(FPIC) -w \
++CFLAGS += -fmessage-length=0 -O2 -ffast-math $(FORCE_32_BIT) $(FPIC) -w \
+ 	 -DECERE_COM_MODULE -DBUILDING_ECERE_COM -DECERE_NOFILE
+ 
+ CECFLAGS =
+ 
+ ECFLAGS = -nolinenumbers -defaultns ecere
+ 
+-OFLAGS += -m32
++OFLAGS += $(FORCE_32_BIT)
+ 
+ LIBS = $(SHAREDLIB) $(EXECUTABLE) $(LINKOPT)
+ 
+diff --git a/ecere/Makefile.vanilla b/ecere/Makefile.vanilla
+index d19e473..2cd869e 100644
+--- a/ecere/Makefile.vanilla
++++ b/ecere/Makefile.vanilla
+@@ -661,7 +661,7 @@ EAR := $(call psep,../obj/$(PLATFORM)/bin/ear)
+ 
+ # FLAGS
+ 
+-CFLAGS += -fmessage-length=0 -Os -m32 $(FPIC) -w \
++CFLAGS += -fmessage-length=0 -Os $(FORCE_32_BIT) $(FPIC) -w \
+ 	 -DBUILDING_ECERE_COM -DECERE_STATIC -DECERE_VANILLA -DNOBLENDING \
+ 	 -Isrc/gfx/drivers/harfbuzz
+ 
+diff --git a/eda/drivers/sqlite/Makefile b/eda/drivers/sqlite/Makefile
+index 1a0ed1e..fcee24d 100644
+--- a/eda/drivers/sqlite/Makefile
++++ b/eda/drivers/sqlite/Makefile
+@@ -61,13 +61,13 @@ EAR := $(call psep,../../../obj/$(PLATFORM)/bin/ear)
+ 
+ # FLAGS
+ 
+-CFLAGS += -fmessage-length=0 -O2 -m32 $(FPIC) -w
++CFLAGS += -fmessage-length=0 -O2 $(FORCE_32_BIT) $(FPIC) -w
+ 
+ CECFLAGS =
+ 
+ ECFLAGS = -nolinenumbers
+ 
+-OFLAGS += -m32 \
++OFLAGS += $(FORCE_32_BIT) \
+ 	 -L../../../obj/$(PLATFORM)/bin \
+ 	 -L../../../obj/$(PLATFORM)/lib
+ 
+diff --git a/eda/drivers/sqliteCipher/Makefile b/eda/drivers/sqliteCipher/Makefile
+index d16db95..ddc0bf5 100644
+--- a/eda/drivers/sqliteCipher/Makefile
++++ b/eda/drivers/sqliteCipher/Makefile
+@@ -65,14 +65,14 @@ EAR := $(call psep,../../../obj/$(PLATFORM)/bin/ear)
+ 
+ # FLAGS
+ 
+-CFLAGS += -fmessage-length=0 -O2 -m32 $(FPIC) -w \
++CFLAGS += -fmessage-length=0 -O2 $(FORCE_32_BIT) $(FPIC) -w \
+ 	 -DSQLITE_HAS_CODEC
+ 
+ CECFLAGS =
+ 
+ ECFLAGS = -nolinenumbers
+ 
+-OFLAGS += -m32 \
++OFLAGS += $(FORCE_32_BIT) \
+ 	 -L../../../obj/$(PLATFORM)/bin \
+ 	 -L../../../obj/$(PLATFORM)/lib
+ 
+diff --git a/eda/libeda/Makefile b/eda/libeda/Makefile
+index 84adf01..4b35f1d 100644
+--- a/eda/libeda/Makefile
++++ b/eda/libeda/Makefile
+@@ -93,13 +93,13 @@ EAR := $(call psep,../../obj/$(PLATFORM)/bin/ear)
+ 
+ # FLAGS
+ 
+-CFLAGS += -fmessage-length=0 -O2 -ffast-math -m32 $(FPIC) -w
++CFLAGS += -fmessage-length=0 -O2 -ffast-math $(FORCE_32_BIT) $(FPIC) -w
+ 
+ CECFLAGS =
+ 
+ ECFLAGS = -nolinenumbers -defaultns eda
+ 
+-OFLAGS += -m32 \
++OFLAGS += $(FORCE_32_BIT) \
+ 	 -L../../obj/$(PLATFORM)/bin \
+ 	 -L../../obj/$(PLATFORM)/lib
+ 
+diff --git a/epj2make/Makefile b/epj2make/Makefile
+index 78cfb16..d2e90d5 100644
+--- a/epj2make/Makefile
++++ b/epj2make/Makefile
+@@ -84,14 +84,14 @@ EAR := $(call psep,../obj/$(PLATFORM)/bin/ear)
+ 
+ # FLAGS
+ 
+-CFLAGS += -fmessage-length=0 -O2 -ffast-math -m32 $(FPIC) -w \
++CFLAGS += -fmessage-length=0 -O2 -ffast-math $(FORCE_32_BIT) $(FPIC) -w \
+ 	 -DMAKEFILE_GENERATOR
+ 
+ CECFLAGS =
+ 
+ ECFLAGS = -nolinenumbers
+ 
+-OFLAGS += -m32 \
++OFLAGS += $(FORCE_32_BIT) \
+ 	 -L../obj/$(PLATFORM)/bin \
+ 	 -L../obj/$(PLATFORM)/lib
+ 
+diff --git a/ide/Makefile b/ide/Makefile
+index 2c2bf85..2a42704 100644
+--- a/ide/Makefile
++++ b/ide/Makefile
+@@ -329,13 +329,13 @@ EAR := $(call psep,../obj/$(PLATFORM)/bin/ear)
+ 
+ # FLAGS
+ 
+-CFLAGS += -fmessage-length=0 -O2 -ffast-math -m32 $(FPIC) -w
++CFLAGS += -fmessage-length=0 -O2 -ffast-math $(FORCE_32_BIT) $(FPIC) -w
+ 
+ CECFLAGS =
+ 
+ ECFLAGS = -nolinenumbers
+ 
+-OFLAGS += -m32 \
++OFLAGS += $(FORCE_32_BIT) \
+ 	 -L../obj/$(PLATFORM)/bin \
+ 	 -L../obj/$(PLATFORM)/lib
+ 
+diff --git a/ide/src/IDESettings.ec b/ide/src/IDESettings.ec
+index 2bbc100..f01da3a 100644
+--- a/ide/src/IDESettings.ec
++++ b/ide/src/IDESettings.ec
+@@ -689,6 +689,7 @@ class CompilerConfig
+    class_no_expansion;
+ 
+    numJobs = 1;
++   supportsBitDepth = true;
+ public:
+    property char * name
+    {
+@@ -760,6 +761,13 @@ public:
+    }
+    bool ccacheEnabled;
+    bool distccEnabled;
++   property bool supportsBitDepth
++   {
++      set { supportsBitDepth = value; }
++      get { return supportsBitDepth; }
++      isset { return !supportsBitDepth; }
++   }
++
+    property char * distccHosts
+    {
+       set { delete distccHosts; if(value && value[0]) distccHosts = CopyString(value); }
+@@ -870,6 +878,7 @@ private:
+    char * cxxCommand;
+    char * execPrefixCommand;
+    char * distccHosts;
++   bool supportsBitDepth;
+    /*union
+    {
+       struct { Array<String> includes, libraries, executables; };
+@@ -916,6 +925,7 @@ private:
+          execPrefixCommand,
+          ccacheEnabled,
+          distccEnabled,
++         supportsBitDepth,
+          distccHosts
+       };
+       for(s : includeDirs) copy.includeDirs.Add(CopyString(s));
+diff --git a/ide/src/dialogs/GlobalSettingsDialog.ec b/ide/src/dialogs/GlobalSettingsDialog.ec
+index 0ea4d6c..9a8140c 100644
+--- a/ide/src/dialogs/GlobalSettingsDialog.ec
++++ b/ide/src/dialogs/GlobalSettingsDialog.ec
+@@ -990,6 +990,24 @@ class CompilerOptionsTab : CompilersSubTab
+       }
+    }
+ 
++   Button supportsBitDepth
++   {
++      this, text = $"Supports forcing bit depth", hotKey = altD, position = { 8, 208 };
++      isCheckbox = true;
++
++      bool NotifyClicked(Button button, int x, int y, Modifiers mods)
++      {
++         CompilerConfig compiler = loadedCompiler;
++         if(compiler)
++         {
++            compiler.supportsBitDepth = button.checked;
++            modifiedDocument = true;
++            compilersTab.modifiedDocument = true;
++         }
++         return true;
++      }
++   };
++
+    CompilerOptionsTab()
+    {
+       Platform p;
+@@ -1015,6 +1033,7 @@ class CompilerOptionsTab : CompilersSubTab
+          distccEnabled.checked = compiler.distccEnabled;
+          distccHosts.disabled = !compiler.distccEnabled;
+          distccHosts.contents = compiler.distccHosts;
++         supportsBitDepth.checked = compiler.supportsBitDepth;
+          prepDefs.strings = compiler.prepDirectives;
+          excludedLibraries.strings = compiler.excludeLibs;
+          
+diff --git a/ide/src/project/Project.ec b/ide/src/project/Project.ec
+index 9bd379a..87632b1 100644
+--- a/ide/src/project/Project.ec
++++ b/ide/src/project/Project.ec
+@@ -1996,6 +1996,8 @@ private:
+                   f.Puts(l);
+                }
+             }
++            f.Printf("\nFORCE_64_BIT = %s", compiler.supportsBitDepth ? "-m64" : "");
++            f.Printf("\nFORCE_32_BIT = %s", compiler.supportsBitDepth ? "-m32" : "");
+ 
+             delete f;
+          }
+@@ -2392,7 +2394,7 @@ private:
+             f.Printf(" $(OPTIMIZE)");
+             forceBitDepth = (options && options.buildBitDepth) || numCObjects;
+             if(forceBitDepth)
+-               f.Printf((!options || !options.buildBitDepth || options.buildBitDepth == bits32) ? " -m32" : " -m64");
++               f.Printf(" %s",(!options || !options.buildBitDepth || options.buildBitDepth == bits32) ? "$(FORCE_32_BIT)" : "$(FORCE_64_BIT)");
+             f.Printf(" $(FPIC)");
+          }
+          switch(GetWarnings(config))
+@@ -2439,7 +2441,7 @@ private:
+          f.Printf("ifneq \"$(TARGET_TYPE)\" \"%s\"\n", TargetTypeToMakefileVariable(staticLibrary));
+          f.Printf("OFLAGS +=");
+          if(forceBitDepth)
+-            f.Printf((!options || !options.buildBitDepth || options.buildBitDepth == bits32) ? " -m32" : " -m64 \\\n");
++            f.Printf((!options || !options.buildBitDepth || options.buildBitDepth == bits32) ? " $(FORCE_32_BIT)" : " $(FORCE_64_BIT) \\\n");
+ 
+          if(GetProfile(config))
+             f.Printf(" -pg");
+diff --git a/ide/src/project/ProjectConfig.ec b/ide/src/project/ProjectConfig.ec
+index a63b139..e6bdb85 100644
+--- a/ide/src/project/ProjectConfig.ec
++++ b/ide/src/project/ProjectConfig.ec
+@@ -348,6 +348,7 @@ public:
+          console = console,
+          compress = compress,
+          excludeFromBuild = excludeFromBuild,
++         buildBitDepth = buildBitDepth,
+          preprocessorDefinitions = CopyArrayString(preprocessorDefinitions),
+          includeDirs = CopyArrayString(includeDirs),
+          libraries = CopyArrayString(libraries),
+diff --git a/include.mk b/include.mk
+index 2a248fc..cfd57e1 100644
+--- a/include.mk
++++ b/include.mk
+@@ -204,3 +204,11 @@ OPENSSL_BIN_DIR = $(call shwspace,$(subst /bin/openssl.cfg,/bin,$(_OPENSSL_CONF)
+ endif
+ 
+ endif
++
++ifeq "$(HOST_ARCH)" "ARM"
++FORCE_64_BIT =
++FORCE_32_BIT =
++else
++FORCE_64_BIT = -m64
++FORCE_32_BIT = -m32
++endif
+-- 
+1.7.9.5
+

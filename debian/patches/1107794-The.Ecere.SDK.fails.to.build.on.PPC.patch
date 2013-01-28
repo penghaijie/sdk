@@ -1,0 +1,35 @@
+From fcdf4b2325e51ff9aaf098b6386b9b8c2e3d862c Mon Sep 17 00:00:00 2001
+From: Jerome St-Louis <jerome@ecere.com>
+Date: Mon, 1 Oct 2012 17:27:23 -0400
+Subject: [PATCH 02/14] ecere/gfx3D/Object3DSFormat: Fixed mistake breaking
+ Big Endian platforms builds
+
+---
+ ecere/src/gfx/3D/models/Object3DSFormat.ec |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/ecere/src/gfx/3D/models/Object3DSFormat.ec b/ecere/src/gfx/3D/models/Object3DSFormat.ec
+index 49e533a..801596e 100644
+--- a/ecere/src/gfx/3D/models/Object3DSFormat.ec
++++ b/ecere/src/gfx/3D/models/Object3DSFormat.ec
+@@ -155,7 +155,7 @@ static uint16 ReadWORD(File f)
+ {
+    uint16 wordValue;
+    f.Read(&wordValue, sizeof(uint16), 1);
+-   BIGENDSWAP_WORD(floatValue);
++   BIGENDSWAP_WORD(wordValue);
+    return wordValue;
+ }
+ 
+@@ -163,7 +163,7 @@ static uint ReadDWORD(File f)
+ {
+    uint dwordValue;
+    f.Read(&dwordValue, sizeof(uint), 1);
+-   BIGENDSWAP_DWORD(floatValue);
++   BIGENDSWAP_DWORD(dwordValue);
+    return dwordValue;
+ }
+ 
+-- 
+1.7.9.5
+

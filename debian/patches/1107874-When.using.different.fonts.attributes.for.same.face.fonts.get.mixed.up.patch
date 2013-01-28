@@ -1,0 +1,47 @@
+From 0b5e94edfdd34159c504c78ed73cd7995de1cd37 Mon Sep 17 00:00:00 2001
+From: Jerome St-Louis <jerome@ecere.com>
+Date: Wed, 14 Nov 2012 15:23:07 -0500
+Subject: [PATCH 10/14] ecere/LFBDisplayDriver (fonts): Fixed font transform
+ and kerning not being reset for different fonts  -
+ Non-italic fonts being italic when another instance
+ of the is made italic  - Fixed wrong kerning when
+ using the same face with different sizes
+
+---
+ ecere/src/gfx/drivers/LFBDisplayDriver.ec |   12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/ecere/src/gfx/drivers/LFBDisplayDriver.ec b/ecere/src/gfx/drivers/LFBDisplayDriver.ec
+index 0b18a04..c682fb0 100644
+--- a/ecere/src/gfx/drivers/LFBDisplayDriver.ec
++++ b/ecere/src/gfx/drivers/LFBDisplayDriver.ec
+@@ -3056,8 +3056,15 @@ public class LFBDisplayDriver : DisplayDriver
+                         matrix.xy = (FT_Fixed)( 0.3 * 0x10000L );
+                         matrix.yx = (FT_Fixed)( 0.0 * 0x10000L );
+                         matrix.yy = (FT_Fixed)( 1.0 * 0x10000L );
+-                        FT_Set_Transform(fontEntry.face, &matrix, &pen );
+                      }
++                     else
++                     {
++                        matrix.xx = (FT_Fixed)( 1.0 * 0x10000L );
++                        matrix.xy = (FT_Fixed)( 0.0 * 0x10000L );
++                        matrix.yx = (FT_Fixed)( 0.0 * 0x10000L );
++                        matrix.yy = (FT_Fixed)( 1.0 * 0x10000L );
++                     }
++                     FT_Set_Transform(fontEntry.face, &matrix, &pen );
+                      FaceSetCharSize(fontEntry.face, size);
+                      font.height = ((fontEntry.face->size->metrics.height) >> 6); //* y_scale;
+                      // printf("Font height is %d\n", font.height);
+@@ -3511,6 +3518,9 @@ public class LFBDisplayDriver : DisplayDriver
+                   else if(delta.x) delta.x += 64 - (delta.x % 64);
+                   *x += delta.x * glyph->scale;
+                }
++               else
++                  FaceSetCharSize(curFontEntry.face, font.size);
++
+                previousGlyph = glyph->glyphNo;
+                previousFace = curFontEntry.face;
+ 
+-- 
+1.7.9.5
+

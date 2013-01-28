@@ -1,0 +1,16 @@
+1107774-The.Ecere.SDK.is.uninstallable.on.Quantal64.bit.patch
+1107794-The.Ecere.SDK.fails.to.build.on.PPC.patch
+1107801-The.Ecere.SDK.fails.to.build.on.ARM.patch
+1107825-Valgrind.reveals.memory.errors.running.the.eC.compiler.patch
+1107827-A.serious.potential.for.undefined.behavior.was.identified.patch
+1107844-Valgrind.complains.about.conditonal.jumps.patch
+1107852-Valgrind.complains.about.Uninitialized.Memory.Read.in.Ecere.FileDialog.patch
+1107864-The.eC.compiler.and.IDE.crashed.on.buffer.overflows.patch
+1107868-A.mutex.was.being.unlocked.without.ever.being.locked.patch
+1107874-When.using.different.fonts.attributes.for.same.face.fonts.get.mixed.up.patch
+1107879-The.color.selection.drop.box.no.longer.displays.the.color.patch
+1107888-The.Debugger.breakpoints.do.not.work.consistently.patch
+1107891-The.HTTP.support.does.not.work.well.patch
+1110284-Makefiles.generated.by.the.Ecere.IDE.do.not.work.by.themselves.patch
+i18n-Updated-templates.patch
+

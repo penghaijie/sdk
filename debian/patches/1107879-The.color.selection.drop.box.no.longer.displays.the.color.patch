@@ -1,0 +1,48 @@
+From 9d3636d8945b157e6ae26e31f34de80da50794c8 Mon Sep 17 00:00:00 2001
+From: Jerome St-Louis <jerome@ecere.com>
+Date: Sat, 26 Jan 2013 22:32:13 -0500
+Subject: [PATCH 11/14] ecere/gui/ColorDropBox: Fixed missing color - Fixed
+ problem introduced by
+ 0faaa3a99957395bcb1a323bf18c8f0e1ffca642
+
+---
+ ecere/src/gfx/Color.ec            |    4 ++--
+ ecere/src/gui/controls/DataBox.ec |    2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/ecere/src/gfx/Color.ec b/ecere/src/gfx/Color.ec
+index cebf813..d5a9954 100644
+--- a/ecere/src/gfx/Color.ec
++++ b/ecere/src/gfx/Color.ec
+@@ -36,13 +36,13 @@ public:
+       return dropBox.Save();
+    }
+ 
+-   Window OnEdit(Window listBox, Window master, int x, int y, int w, int h, Window control)
++   Window OnEdit(Window dataBox, Window master, int x, int y, int w, int h, Window control)
+    {
+       Size size = { 0 };
+       char * string = "";
+       ColorDropBox colorDropBox 
+       {
+-         listBox, master = master, editText = true, //position = Point { x + 24, y }, /*clientSize.h = */size.h = h, size.w = w - 24,
++         dataBox, master = master, editText = true, //position = Point { x + 24, y }, /*clientSize.h = */size.h = h, size.w = w - 24,
+          anchor = { left = 24, top = 0, right = 0, bottom = 0 },
+          color = this, control = control
+       };
+diff --git a/ecere/src/gui/controls/DataBox.ec b/ecere/src/gui/controls/DataBox.ec
+index 72c6837..b927b58 100644
+--- a/ecere/src/gui/controls/DataBox.ec
++++ b/ecere/src/gui/controls/DataBox.ec
+@@ -136,7 +136,7 @@ private:
+ 
+    void OnRedraw(Surface surface)
+    {
+-      if(type && (!editor || !editor.created))
++      if(type && (!editor || !editor.created || editor.anchor.left)) // ColorDropBox lets part of the DataBox show
+       {
+          char tempString[1024];
+          if(type._vTbl[__ecereVMethodID_class_OnDisplay] == class(Instance)._vTbl[__ecereVMethodID_class_OnDisplay])
+-- 
+1.7.9.5
+

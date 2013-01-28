@@ -1,0 +1,101 @@
+From 0d20e6f3ae7530e8ddb43b3e79d0ce903cc2ecaa Mon Sep 17 00:00:00 2001
+From: Jerome St-Louis <jerome@ecere.com>
+Date: Mon, 28 Jan 2013 04:29:50 -0500
+Subject: [PATCH 05/14] compiler/libec: Fixed crashes by properly
+ reinitializing members of union inside Specifier
+ class
+
+---
+ compiler/bootstrap/libec/bootstrap/pass3.c |    9 +++++++++
+ compiler/libec/src/pass3.ec                |    9 +++++++++
+ 2 files changed, 18 insertions(+)
+
+diff --git a/compiler/bootstrap/libec/bootstrap/pass3.c b/compiler/bootstrap/libec/bootstrap/pass3.c
+index 209a183..9472e2a 100644
+--- a/compiler/bootstrap/libec/bootstrap/pass3.c
++++ b/compiler/bootstrap/libec/bootstrap/pass3.c
+@@ -1067,9 +1067,12 @@ name[0] = (char)0;
+ FullClassNameCat(name, _class->fullName, 0x0);
+ (__ecereNameSpace__ecere__com__eSystem_Delete(spec->name), spec->name = 0);
+ spec->type = 3;
++spec->baseSpecs = (((void *)0));
+ spec->id = MkIdentifier(name);
+ spec->list = (((void *)0));
+ spec->definitions = (((void *)0));
++spec->ctx = (((void *)0));
++spec->addNameSpace = 0x0;
+ }
+ else if(_class && _class->type == 5)
+ {
+@@ -1078,9 +1081,12 @@ char name[1024] = "";
+ FullClassNameCat(name, _class->fullName, 0x0);
+ (__ecereNameSpace__ecere__com__eSystem_Delete(spec->name), spec->name = 0);
+ spec->type = 3;
++spec->baseSpecs = (((void *)0));
+ spec->id = MkIdentifier(name);
+ spec->list = (((void *)0));
+ spec->definitions = (((void *)0));
++spec->ctx = (((void *)0));
++spec->addNameSpace = 0x0;
+ }
+ else if(_class)
+ {
+@@ -1125,7 +1131,10 @@ else
+ spec->type = 3;
+ spec->id = MkIdentifier("__ecereNameSpace__ecere__com__Instance");
+ spec->list = (((void *)0));
++spec->baseSpecs = (((void *)0));
+ spec->definitions = (((void *)0));
++spec->ctx = (((void *)0));
++spec->addNameSpace = 0x0;
+ }
+ if(_class && _class->dataTypeString && !strcmp(_class->dataTypeString, "char *"))
+ return 0x1;
+diff --git a/compiler/libec/src/pass3.ec b/compiler/libec/src/pass3.ec
+index 81fe896..5fa9fcd 100644
+--- a/compiler/libec/src/pass3.ec
++++ b/compiler/libec/src/pass3.ec
+@@ -88,6 +88,7 @@ static bool ReplaceClassSpec(OldList specs, Specifier spec, bool param)
+             //spec.name = CopyString(name);
+             delete spec.name;
+             spec.type = structSpecifier;
++            spec.baseSpecs = null;
+             spec.id = MkIdentifier(name);
+             spec.list = null;
+             spec.definitions = null;
+@@ -103,6 +104,8 @@ static bool ReplaceClassSpec(OldList specs, Specifier spec, bool param)
+                curContext = ctx;
+             }
+             */
++            spec.ctx = null;
++            spec.addNameSpace = false;
+          }
+          else if(_class && _class.type == noHeadClass)
+          {
+@@ -115,9 +118,12 @@ static bool ReplaceClassSpec(OldList specs, Specifier spec, bool param)
+             FullClassNameCat(name, _class.fullName, false);
+             delete spec.name;
+             spec.type = structSpecifier;
++            spec.baseSpecs = null;
+             spec.id = MkIdentifier(name);
+             spec.list = null;
+             spec.definitions = null;
++            spec.ctx = null;
++            spec.addNameSpace = false;
+          }
+          else if(_class)
+          {
+@@ -176,7 +182,10 @@ static bool ReplaceClassSpec(OldList specs, Specifier spec, bool param)
+             spec.type = structSpecifier;
+             spec.id = MkIdentifier("__ecereNameSpace__ecere__com__Instance");
+             spec.list = null;
++            spec.baseSpecs = null;
+             spec.definitions = null;
++            spec.ctx = null;
++            spec.addNameSpace = false;
+          }
+ 
+          if(_class && _class.dataTypeString && !strcmp(_class.dataTypeString /*fullName*/, "char *"))
+-- 
+1.7.9.5
+

@@ -1,0 +1,194 @@
+From ad37c4fd6bf980b0af4712973fadf5d3fdcbb06e Mon Sep 17 00:00:00 2001
+From: Jerome St-Louis <jerome@ecere.com>
+Date: Mon, 28 Jan 2013 04:46:15 -0500
+Subject: [PATCH 06/14] ecere/com: Resolved conditional jumps based on
+ uninitialized values reported by Valgrind  by solving
+ class registration ordering issues - Also fixed an
+ uninitialized value in Surface.ec reported in
+ Valgrind - Also fixed wrong invalid file descriptor
+ check reported as closing -1 file descriptor in
+ Valgrind
+
+---
+ compiler/bootstrap/ecere/bootstrap/instance.c |   29 +++++++++++--------------
+ ecere/src/com/instance.ec                     |   29 +++++++++++++++++++------
+ ecere/src/gfx/Surface.ec                      |    2 +-
+ ecere/src/gui/drivers/XInterface.ec           |    8 +++----
+ 4 files changed, 40 insertions(+), 28 deletions(-)
+
+diff --git a/compiler/bootstrap/ecere/bootstrap/instance.c b/compiler/bootstrap/ecere/bootstrap/instance.c
+index 6f077ba..c25ea8f 100644
+--- a/compiler/bootstrap/ecere/bootstrap/instance.c
++++ b/compiler/bootstrap/ecere/bootstrap/instance.c
+@@ -1163,7 +1163,16 @@ int offsetClass, totalSizeClass;
+ for(baseClass = base; baseClass->base; baseClass = baseClass->base)
+ ;
+ if(base && !base->internalDecl && (base->type == 5 || base->type == 1 || base->type == 0))
++{
++if(base->type == 1 && type == 0)
++type = 5;
++else
++type = base->type;
++}
++if(base && (_class->type == 0 || _class->type == 5 || _class->type == 1) && (base->type == 3 || base->type == 2 || base->type == 4))
++{
+ type = base->type;
++}
+ if(type == 4)
+ {
+ if(base->type != 4)
+@@ -1213,8 +1222,9 @@ _class->sizeClass = totalSizeClass;
+ {
+ struct __ecereNameSpace__ecere__com__Method * method, * next;
+ struct __ecereNameSpace__ecere__com__Class * b;
++unsigned int needUpdate = (mod != (base->templateClass ? base->templateClass : base) || _class->vTblSize != mod->vTblSize);
+ 
+-if(mod->base && mod->base->base && mod->base->vTblSize > baseClass->vTblSize && (mod != (base->templateClass ? base->templateClass : base) || _class->vTblSize != mod->vTblSize))
++if(mod->base && mod->base->base && mod->base->vTblSize > baseClass->vTblSize && needUpdate)
+ {
+ _class->vTblSize += mod->base->vTblSize - baseClass->vTblSize;
+ _class->_vTbl = __ecereNameSpace__ecere__com__eSystem_Renew(_class->_vTbl, sizeof(void *) * (_class->vTblSize));
+@@ -1225,6 +1235,7 @@ next = (struct __ecereNameSpace__ecere__com__Method *)__ecereProp___ecereNameSpa
+ if(method->type == 1)
+ method->vid += mod->base->vTblSize - baseClass->vTblSize;
+ }
++}
+ for(b = mod->base; b && b != (((void *)0)); b = b->base)
+ {
+ struct __ecereNameSpace__ecere__com__Method * vMethod;
+@@ -1252,21 +1263,7 @@ method->dataTypeString = __ecereNameSpace__ecere__sys__CopyString(vMethod->dataT
+ method->_class = vMethod->_class;
+ }
+ }
+-else
+-_class->_vTbl[vMethod->vid] = _class->base->_vTbl[vMethod->vid];
+-}
+-}
+-}
+-}
+-for(b = mod->base; b && b != (((void *)0)); b = b->base)
+-{
+-struct __ecereNameSpace__ecere__com__Method * vMethod;
+-
+-for(vMethod = (struct __ecereNameSpace__ecere__com__Method *)__ecereProp___ecereNameSpace__ecere__sys__BinaryTree_Get_first(&b->methods); vMethod; vMethod = (struct __ecereNameSpace__ecere__com__Method *)__ecereProp___ecereNameSpace__ecere__sys__BTNode_Get_next(((struct __ecereNameSpace__ecere__sys__BTNode *)vMethod)))
+-{
+-if(vMethod->type == 1)
+-{
+-if(_class->_vTbl[vMethod->vid] == baseClass->_vTbl[vMethod->vid] && _class->_vTbl[vMethod->vid] != _class->base->_vTbl[vMethod->vid])
++else if(needUpdate || _class->_vTbl[vMethod->vid] == b->_vTbl[vMethod->vid])
+ _class->_vTbl[vMethod->vid] = _class->base->_vTbl[vMethod->vid];
+ }
+ }
+diff --git a/ecere/src/com/instance.ec b/ecere/src/com/instance.ec
+index 97f5e8a..def94f4 100644
+--- a/ecere/src/com/instance.ec
++++ b/ecere/src/com/instance.ec
+@@ -1896,8 +1896,20 @@ static void FixDerivativesBase(Class base, Class mod)
+       int offsetClass, totalSizeClass;
+ 
+       for(baseClass = base; baseClass.base; baseClass = baseClass.base);
+-      
+-      if(base && !base.internalDecl && (base.type == noHeadClass || base.type == structClass || base.type == normalClass)) type = base.type;
++
++      if(base && !base.internalDecl && (base.type == noHeadClass || base.type == structClass || base.type == normalClass))
++      {
++         // Normal classes inheriting off simple classes should become no head classes
++         if(base.type == structClass && type == normalClass)
++            type = noHeadClass;
++         else
++            type = base.type;
++      }
++      if(base && (_class.type == normalClass || _class.type == noHeadClass || _class.type == structClass) &&
++         (base.type == unitClass || base.type == bitClass || base.type == enumClass))
++      {
++         type = base.type;
++      }
+ 
+       if(type == enumClass)
+       {
+@@ -1971,9 +1983,9 @@ static void FixDerivativesBase(Class base, Class mod)
+       {
+          Method method, next;
+          Class b;
++         bool needUpdate = (mod != (base.templateClass ? base.templateClass : base) || _class.vTblSize != mod.vTblSize;
+ 
+-         if(mod.base && mod.base.base && mod.base.vTblSize > baseClass.vTblSize && 
+-            (mod != (base.templateClass ? base.templateClass : base) || _class.vTblSize != mod.vTblSize))
++         if(mod.base && mod.base.base && mod.base.vTblSize > baseClass.vTblSize && needUpdate)
+          {
+             _class.vTblSize += mod.base.vTblSize - baseClass.vTblSize;
+             _class._vTbl = renew _class._vTbl void *[_class.vTblSize];
+@@ -1986,6 +1998,7 @@ static void FixDerivativesBase(Class base, Class mod)
+                if(method.type == virtualMethod)
+                   method.vid += mod.base.vTblSize - baseClass.vTblSize;
+             }
++         }
+ 
+             for(b = mod.base; b && b != null; b = b.base)
+             {
+@@ -2012,13 +2025,14 @@ static void FixDerivativesBase(Class base, Class mod)
+                            method._class = vMethod._class;
+                         }
+                      }
+-                     else
++                     else if(needUpdate || _class._vTbl[vMethod.vid] == b._vTbl[vMethod.vid])
+                         _class._vTbl[vMethod.vid] = _class.base._vTbl[vMethod.vid];
+                   }
+                }
+             }
+-         }
+ 
++         // Moving out the above block of code outside the if to handle this
++         /*
+          // Also doing this now, otherwise overridden methods of base classes from intermediate classes will not be set in higher level class
+          // (e.g. OnGetString overridden in Id , Location inheriting from Id, LocationAbbreviation created later inheriting from Location would not get Id's OnGetString)
+          for(b = mod.base; b && b != null; b = b.base)
+@@ -2028,11 +2042,12 @@ static void FixDerivativesBase(Class base, Class mod)
+             {
+                if(vMethod.type == virtualMethod)
+                {
+-                  if(_class._vTbl[vMethod.vid] == baseClass._vTbl[vMethod.vid] && _class._vTbl[vMethod.vid] != _class.base._vTbl[vMethod.vid])
++                  if(_class._vTbl[vMethod.vid] == b._vTbl[vMethod.vid] && _class._vTbl[vMethod.vid] != _class.base._vTbl[vMethod.vid])
+                      _class._vTbl[vMethod.vid] = _class.base._vTbl[vMethod.vid];
+                }
+             }
+          }
++         */
+       }
+ 
+       // _class.defaultAlignment = base ? base.defaultAlignment : 0;
+diff --git a/ecere/src/gfx/Surface.ec b/ecere/src/gfx/Surface.ec
+index 5a6bb1c..1a4c201 100644
+--- a/ecere/src/gfx/Surface.ec
++++ b/ecere/src/gfx/Surface.ec
+@@ -416,7 +416,7 @@ public:
+          float inc = 1.0f/(height-1);
+          float percent = 0;
+          int start;
+-         ColorAlpha color;
++         ColorAlpha color = 0;
+          int firstPixel = (direction == horizontal) ? x1 : y1;
+          int lastPixel = (direction == horizontal) ? x2 : y2;
+          int boxLeft = (direction == horizontal) ? box.left : box.top;
+diff --git a/ecere/src/gui/drivers/XInterface.ec b/ecere/src/gui/drivers/XInterface.ec
+index 0683181..3a9841d 100644
+--- a/ecere/src/gui/drivers/XInterface.ec
++++ b/ecere/src/gui/drivers/XInterface.ec
+@@ -1240,10 +1240,10 @@ class XInterface : Interface
+       XCloseDisplay(xGlobalDisplay);
+       xGlobalDisplay = null;
+ 
+-      if(joystickFD[0]) close(joystickFD[0]);
+-      if(joystickFD[1]) close(joystickFD[1]);
+-      if(joystickFD[2]) close(joystickFD[2]);
+-      if(joystickFD[3]) close(joystickFD[3]);
++      if(joystickFD[0] != -1) close(joystickFD[0]);
++      if(joystickFD[1] != -1) close(joystickFD[1]);
++      if(joystickFD[2] != -1) close(joystickFD[2]);
++      if(joystickFD[3] != -1) close(joystickFD[3]);
+    }
+ 
+    #define DBLCLICK_DELAY  300   // 0.3 second
+-- 
+1.7.9.5
+

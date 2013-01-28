@@ -1,0 +1,1218 @@
+From 4619b9e26842d7480263fa4e489e6dcead929c11 Mon Sep 17 00:00:00 2001
+From: Jerome St-Louis <jerome@ecere.com>
+Date: Mon, 28 Jan 2013 04:55:10 -0500
+Subject: [PATCH 08/14] compiler/ide: Fixed buffer overflows in local char
+ arrays
+
+---
+ compiler/bootstrap/ecc/bootstrap/ecc.c          |    7 ++-
+ compiler/bootstrap/ecere/bootstrap/DualPipe.c   |    8 ++-
+ compiler/bootstrap/ecere/bootstrap/File.c       |    9 ++-
+ compiler/bootstrap/ecere/bootstrap/System.c     |    9 ++-
+ compiler/bootstrap/ecere/bootstrap/dataTypes.c  |    4 ++
+ compiler/bootstrap/ecere/bootstrap/instance.c   |    6 ++
+ compiler/bootstrap/ecp/bootstrap/ecp.c          |    7 ++-
+ compiler/bootstrap/include/stdio.h              |    4 ++
+ compiler/bootstrap/libec/bootstrap/ecdefs.c     |   12 ++--
+ compiler/bootstrap/libec/bootstrap/expression.c |    4 ++
+ compiler/bootstrap/libec/bootstrap/grammar.c    |    4 ++
+ compiler/bootstrap/libec/bootstrap/lexer.c      |    4 ++
+ compiler/bootstrap/libec/bootstrap/type.c       |    4 ++
+ compiler/ecc/ecc.ec                             |    7 +--
+ compiler/ecp/ecp.ec                             |    5 +-
+ compiler/libec/src/ecdefs.ec                    |    6 +-
+ ecere/src/com/BTNode.ec                         |    1 +
+ ecere/src/com/String.ec                         |    2 +-
+ ecere/src/com/instance.ec                       |    4 ++
+ ecere/src/gfx/Surface.ec                        |   10 +--
+ ecere/src/gui/Window.ec                         |    7 +--
+ ecere/src/gui/controls/DropBox.ec               |    3 +-
+ ecere/src/gui/controls/EditBox.ec               |    6 +-
+ ecere/src/gui/controls/ListBox.ec               |    7 ++-
+ ecere/src/gui/controls/StatusBar.ec             |   12 ++--
+ ecere/src/net/Socket.ec                         |    3 +-
+ ecere/src/sys/DualPipe.ec                       |    6 +-
+ ecere/src/sys/File.ec                           |    3 +-
+ ecere/src/sys/System.c                          |   10 +--
+ ecere/src/sys/System.ec                         |    3 +-
+ ide/src/debugger/Debugger.ec                    |   76 +++++++++++++----------
+ ide/src/designer/CodeEditor.ec                  |   19 +++---
+ ide/src/panels/CallStackView.ec                 |    4 +-
+ ide/src/panels/OutputView.ec                    |    8 +--
+ ide/src/panels/ThreadsView.ec                   |    4 +-
+ ide/src/project/Project.ec                      |    1 +
+ ide/src/project/Workspace.ec                    |   14 ++++-
+ 37 files changed, 192 insertions(+), 111 deletions(-)
+
+diff --git a/compiler/bootstrap/ecc/bootstrap/ecc.c b/compiler/bootstrap/ecc/bootstrap/ecc.c
+index 9861254..56e7b4d 100644
+--- a/compiler/bootstrap/ecc/bootstrap/ecc.c
++++ b/compiler/bootstrap/ecc/bootstrap/ecc.c
+@@ -686,7 +686,7 @@ char *  fullName;
+ char __ecere_padding[20];
+ };
+ 
+-extern int sprintf(char * , char * , ...);
++extern int snprintf(char * , int, char * , ...);
+ 
+ extern struct __ecereNameSpace__ecere__com__Instance * __ecereNameSpace__ecere__sys__DualPipeOpen(unsigned int mode, char *  commandLine);
+ 
+@@ -996,8 +996,9 @@ printf(__ecereNameSpace__ecere__GetTranslatedString(__thisModule, "Syntax:\n   e
+ else
+ {
+ struct __ecereNameSpace__ecere__com__Instance * cppOutput;
+-char command[1024];
++char command[3075LL];
+ 
++command[sizeof command - 1] = (char)0;
+ SetGlobalData(&globalData);
+ SetExcludedSymbols(&_excludedSymbols);
+ SetGlobalContext(globalContext);
+@@ -1021,7 +1022,7 @@ struct GlobalData * data = (data = __ecereNameSpace__ecere__com__eInstance_New(_
+ data->key = (unsigned int)data->fullName;
+ __ecereMethod___ecereNameSpace__ecere__sys__BinaryTree_Add(&globalData.functions, (struct __ecereNameSpace__ecere__sys__BTNode *)data);
+ }
+-sprintf(command, "%s%s -x c -E \"%s\"", cppCommand, cppOptions ? cppOptions : "", GetSourceFile());
++snprintf(command, sizeof command, "%s%s -x c -E \"%s\"", cppCommand, cppOptions ? cppOptions : "", GetSourceFile());
+ if((cppOutput = __ecereNameSpace__ecere__sys__DualPipeOpen((((unsigned int)(0x1))), command)))
+ {
+ char impFile[797];
+diff --git a/compiler/bootstrap/ecere/bootstrap/DualPipe.c b/compiler/bootstrap/ecere/bootstrap/DualPipe.c
+index be9d8d3..c0d5ea6 100644
+--- a/compiler/bootstrap/ecere/bootstrap/DualPipe.c
++++ b/compiler/bootstrap/ecere/bootstrap/DualPipe.c
+@@ -443,7 +443,7 @@ struct __ecereNameSpace__ecere__sys__DualPipe * __ecerePointer___ecereNameSpace_
+ DualPipe_Wait(__ecerePointer___ecereNameSpace__ecere__sys__DualPipe->dp);
+ }
+ 
+-extern int vsprintf(char * , const char * , __builtin_va_list);
++extern int vsnprintf(char * , int, const char * , __builtin_va_list);
+ 
+ struct __ecereNameSpace__ecere__com__Instance * __ecereNameSpace__ecere__sys__DualPipeOpen(unsigned int mode, char *  commandLine);
+ 
+@@ -452,8 +452,9 @@ struct __ecereNameSpace__ecere__com__Instance * __ecereNameSpace__ecere__sys__Du
+ char commandLine[1025];
+ va_list args;
+ 
++commandLine[sizeof commandLine - 1] = (char)0;
+ __builtin_va_start(args, command);
+-vsprintf(commandLine, command, args);
++vsnprintf(commandLine, sizeof commandLine, command, args);
+ __builtin_va_end(args);
+ return __ecereNameSpace__ecere__sys__DualPipeOpen(mode, commandLine);
+ }
+@@ -478,8 +479,9 @@ struct __ecereNameSpace__ecere__com__Instance * __ecereNameSpace__ecere__sys__Du
+ char commandLine[1025];
+ va_list args;
+ 
++commandLine[sizeof commandLine - 1] = (char)0;
+ __builtin_va_start(args, command);
+-vsprintf(commandLine, command, args);
++vsnprintf(commandLine, sizeof commandLine, command, args);
+ __builtin_va_end(args);
+ return __ecereNameSpace__ecere__sys__DualPipeOpenEnv(mode, env, commandLine);
+ }
+diff --git a/compiler/bootstrap/ecere/bootstrap/File.c b/compiler/bootstrap/ecere/bootstrap/File.c
+index f0761c2..ccf1a33 100644
+--- a/compiler/bootstrap/ecere/bootstrap/File.c
++++ b/compiler/bootstrap/ecere/bootstrap/File.c
+@@ -287,6 +287,10 @@ size_t fread(void * ptr, size_t size, size_t nmemb, FILE * stream);
+ 
+ size_t fwrite(const void * ptr, size_t size, size_t nmemb, FILE * stream);
+ 
++int vsnprintf(char *, size_t, const char *, ...);
++
++int snprintf(char * str, size_t, const char * format, ...);
++
+ int fseek(FILE * stream, long offset, int whence);
+ 
+ long ftell(FILE * stream);
+@@ -670,8 +674,6 @@ struct __ecereNameSpace__ecere__sys__File * __ecerePointer___ecereNameSpace__ece
+ return ((unsigned int (*)(struct __ecereNameSpace__ecere__com__Instance *, int type, uint64 start, uint64 length, unsigned int wait))this->_vTbl[__ecereVMethodID___ecereNameSpace__ecere__sys__File_Lock])(this, 0, start, length, wait);
+ }
+ 
+-extern int vsprintf(char * , const char * , __builtin_va_list);
+-
+ extern int strlen(const char * );
+ 
+ int __ecereVMethodID___ecereNameSpace__ecere__sys__File_Puts;
+@@ -686,8 +688,9 @@ if(format)
+ char text[1025];
+ va_list args;
+ 
++text[sizeof text - 1] = (char)0;
+ __builtin_va_start(args, format);
+-vsprintf(text, format, args);
++vsnprintf(text, sizeof text, format, args);
+ if(((unsigned int (*)(struct __ecereNameSpace__ecere__com__Instance *, const char *  string))this->_vTbl[__ecereVMethodID___ecereNameSpace__ecere__sys__File_Puts])(this, text))
+ result = strlen(text);
+ __builtin_va_end(args);
+diff --git a/compiler/bootstrap/ecere/bootstrap/System.c b/compiler/bootstrap/ecere/bootstrap/System.c
+index d410daa..4f895b4 100644
+--- a/compiler/bootstrap/ecere/bootstrap/System.c
++++ b/compiler/bootstrap/ecere/bootstrap/System.c
+@@ -287,6 +287,10 @@ size_t fread(void * ptr, size_t size, size_t nmemb, FILE * stream);
+ 
+ size_t fwrite(const void * ptr, size_t size, size_t nmemb, FILE * stream);
+ 
++int vsnprintf(char *, size_t, const char *, ...);
++
++int snprintf(char * str, size_t, const char * format, ...);
++
+ int fseek(FILE * stream, long offset, int whence);
+ 
+ long ftell(FILE * stream);
+@@ -447,8 +451,6 @@ void __ecereNameSpace__ecere__sys__GetFreeSpace(char * path, struct __ecereNameS
+ System_GetFreeSpace(path, size);
+ }
+ 
+-extern int vsprintf(char * , const char * , __builtin_va_list);
+-
+ void __ecereNameSpace__ecere__sys__Log(char *  text);
+ 
+ void __ecereNameSpace__ecere__sys__Logf(char * format, ...)
+@@ -456,8 +458,9 @@ void __ecereNameSpace__ecere__sys__Logf(char * format, ...)
+ va_list args;
+ char string[1025];
+ 
++string[sizeof string - 1] = (char)0;
+ __builtin_va_start(args, format);
+-vsprintf(string, format, args);
++vsnprintf(string, sizeof string, format, args);
+ __ecereNameSpace__ecere__sys__Log(string);
+ __builtin_va_end(args);
+ }
+diff --git a/compiler/bootstrap/ecere/bootstrap/dataTypes.c b/compiler/bootstrap/ecere/bootstrap/dataTypes.c
+index 3d08315..cc06127 100644
+--- a/compiler/bootstrap/ecere/bootstrap/dataTypes.c
++++ b/compiler/bootstrap/ecere/bootstrap/dataTypes.c
+@@ -2178,6 +2178,10 @@ size_t fread(void * ptr, size_t size, size_t nmemb, FILE * stream);
+ 
+ size_t fwrite(const void * ptr, size_t size, size_t nmemb, FILE * stream);
+ 
++int vsnprintf(char *, size_t, const char *, ...);
++
++int snprintf(char * str, size_t, const char * format, ...);
++
+ int fseek(FILE * stream, long offset, int whence);
+ 
+ long ftell(FILE * stream);
+diff --git a/compiler/bootstrap/ecere/bootstrap/instance.c b/compiler/bootstrap/ecere/bootstrap/instance.c
+index c25ea8f..1a81163 100644
+--- a/compiler/bootstrap/ecere/bootstrap/instance.c
++++ b/compiler/bootstrap/ecere/bootstrap/instance.c
+@@ -286,6 +286,10 @@ size_t fread(void * ptr, size_t size, size_t nmemb, FILE * stream);
+ 
+ size_t fwrite(const void * ptr, size_t size, size_t nmemb, FILE * stream);
+ 
++int vsnprintf(char *, size_t, const char *, ...);
++
++int snprintf(char * str, size_t, const char * format, ...);
++
+ int fseek(FILE * stream, long offset, int whence);
+ 
+ long ftell(FILE * stream);
+@@ -5056,8 +5060,10 @@ __ecereNameSpace__ecere__com__eSystem_RegisterFunction("strncpy", "char * strncp
+ __ecereNameSpace__ecere__com__eSystem_RegisterFunction("memcpy", "void * memcpy(void *, const void *, uint size)", memcpy, module, 4);
+ __ecereNameSpace__ecere__com__eSystem_RegisterFunction("memmove", "void * memmove(void *, const void *, uint size)", memmove, module, 4);
+ __ecereNameSpace__ecere__com__eSystem_RegisterFunction("sprintf", "int sprintf(char *, char *, ...)", sprintf, module, 4);
++__ecereNameSpace__ecere__com__eSystem_RegisterFunction("snprintf", "int sprintf(char *, int, char *, ...)", snprintf, module, 4);
+ __ecereNameSpace__ecere__com__eSystem_RegisterFunction("printf", "int printf(char *, ...)", printf, module, 4);
+ __ecereNameSpace__ecere__com__eSystem_RegisterFunction("vsprintf", "int vsprintf(char*, const char*, __builtin_va_list)", vsprintf, module, 4);
++__ecereNameSpace__ecere__com__eSystem_RegisterFunction("vsnprintf", "int vsnprintf(char*, int, const char*, __builtin_va_list)", vsnprintf, module, 4);
+ __ecereNameSpace__ecere__com__eSystem_RegisterFunction("puts", "int puts(char *)", puts, module, 4);
+ __ecereNameSpace__ecere__com__eSystem_RegisterFunction("fputs", "int fputs(char *, void * stream)", fputs, module, 4);
+ __ecereNameSpace__ecere__com__eSystem_RegisterFunction("isalnum", "int isalnum(int c)", isalnum, module, 4);
+diff --git a/compiler/bootstrap/ecp/bootstrap/ecp.c b/compiler/bootstrap/ecp/bootstrap/ecp.c
+index dd1a8a8..c2edb18 100644
+--- a/compiler/bootstrap/ecp/bootstrap/ecp.c
++++ b/compiler/bootstrap/ecp/bootstrap/ecp.c
+@@ -2405,7 +2405,7 @@ extern unsigned int __ecereNameSpace__ecere__sys__FileExists(char *  fileName);
+ 
+ extern unsigned int __ecereNameSpace__ecere__sys__DeleteFile(char *  fileName);
+ 
+-extern int sprintf(char * , char * , ...);
++extern int snprintf(char * , int, char * , ...);
+ 
+ extern struct __ecereNameSpace__ecere__com__Instance * __ecereNameSpace__ecere__sys__DualPipeOpen(unsigned int mode, char *  commandLine);
+ 
+@@ -2629,9 +2629,10 @@ if(!valid)
+ printf(__ecereNameSpace__ecere__GetTranslatedString(__thisModule, "Syntax:\n   ecp [-t <target platform>] [-cpp <c preprocessor>] [-o <output>] [-symbols <outputdir>] [-I<includedir>]* [-isystem <sysincludedir>]* [-D<definition>]* -c <input>\n", (((void *)0))));
+ else
+ {
+-char command[1024];
++char command[3075LL];
+ struct __ecereNameSpace__ecere__com__Instance * cppOutput;
+ 
++command[sizeof command - 1] = (char)0;
+ SetGlobalContext(globalContext);
+ SetTopContext(globalContext);
+ SetCurrentContext(globalContext);
+@@ -2656,7 +2657,7 @@ char * outputFilePath = GetOutputFile();
+ if(__ecereNameSpace__ecere__sys__FileExists(outputFilePath))
+ __ecereNameSpace__ecere__sys__DeleteFile(outputFilePath);
+ }
+-sprintf(command, "%s%s -x c -E \"%s\"", cppCommand, cppOptions ? cppOptions : "", GetSourceFile());
++snprintf(command, sizeof command, "%s%s -x c -E \"%s\"", cppCommand, cppOptions ? cppOptions : "", GetSourceFile());
+ if((cppOutput = __ecereNameSpace__ecere__sys__DualPipeOpen((((unsigned int)(0x1))), command)))
+ {
+ int exitCode;
+diff --git a/compiler/bootstrap/include/stdio.h b/compiler/bootstrap/include/stdio.h
+index c9cb5f8..166a775 100644
+--- a/compiler/bootstrap/include/stdio.h
++++ b/compiler/bootstrap/include/stdio.h
+@@ -29,6 +29,10 @@ int fprintf(FILE *stream, const char *format, ...);
+ int fputc(int c, FILE *stream);
+ size_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream);
+ size_t fwrite(const  void  *ptr,  size_t  size,  size_t  nmemb, FILE *stream);
++int vsnprintf (char*, size_t, const char*, ...);
++
++int vsnprintf (char*, size_t, const char*, ...);
++int snprintf(char *str, size_t, const char *format, ...);
+ 
+ int fseek(FILE *stream, long offset, int whence);
+ long ftell(FILE *stream);
+diff --git a/compiler/bootstrap/libec/bootstrap/ecdefs.c b/compiler/bootstrap/libec/bootstrap/ecdefs.c
+index 059ca2d..7d729c6 100644
+--- a/compiler/bootstrap/libec/bootstrap/ecdefs.c
++++ b/compiler/bootstrap/libec/bootstrap/ecdefs.c
+@@ -923,6 +923,10 @@ size_t fread(void * ptr, size_t size, size_t nmemb, FILE * stream);
+ 
+ size_t fwrite(const void * ptr, size_t size, size_t nmemb, FILE * stream);
+ 
++int vsnprintf(char *, size_t, const char *, ...);
++
++int snprintf(char * str, size_t, const char * format, ...);
++
+ int fseek(FILE * stream, long offset, int whence);
+ 
+ long ftell(FILE * stream);
+@@ -1549,8 +1553,6 @@ extern char *  __ecereNameSpace__ecere__GetTranslatedString(struct __ecereNameSp
+ 
+ extern struct __ecereNameSpace__ecere__com__Instance * __thisModule;
+ 
+-extern int vsprintf(char * , const char * , __builtin_va_list);
+-
+ extern int fputs(char * , void *  stream);
+ 
+ extern struct __ecereNameSpace__ecere__com__Class * __ecereClass___ecereNameSpace__ecere__com__NameSpace;
+@@ -1613,6 +1615,7 @@ if(!parsingType)
+ va_list args;
+ char string[10000];
+ 
++string[sizeof string - 1] = (char)0;
+ if(yylloc.start.included)
+ {
+ __ecereNameSpace__ecere__sys__GetWorkingDir(string, sizeof string);
+@@ -1626,7 +1629,7 @@ __ecereNameSpace__ecere__sys__PathCat(string, sourceFile);
+ printf(string);
+ printf(__ecereNameSpace__ecere__GetTranslatedString(__thisModule, ":%d:%d: error: ", (((void *)0))), yylloc.start.line, yylloc.start.charPos);
+ __builtin_va_start(args, format);
+-vsprintf(string, format, args);
++vsnprintf(string, sizeof string, format, args);
+ __builtin_va_end(args);
+ fputs(string, (bsl_stdout()));
+ ((struct __ecereNameSpace__ecere__com__Application *)(((char *)((struct __ecereNameSpace__ecere__com__Module *)(((char *)__thisModule + 12)))->application + 300)))->exitCode = 1;
+@@ -1652,6 +1655,7 @@ if(inCompiler)
+ va_list args;
+ char string[10000];
+ 
++string[sizeof string - 1] = (char)0;
+ if(yylloc.start.included)
+ {
+ __ecereNameSpace__ecere__sys__GetWorkingDir(string, sizeof string);
+@@ -1665,7 +1669,7 @@ __ecereNameSpace__ecere__sys__PathCat(string, sourceFile);
+ printf(string);
+ printf(__ecereNameSpace__ecere__GetTranslatedString(__thisModule, ":%d:%d: warning: ", (((void *)0))), yylloc.start.line, yylloc.start.charPos);
+ __builtin_va_start(args, format);
+-vsprintf(string, format, args);
++vsnprintf(string, sizeof string, format, args);
+ __builtin_va_end(args);
+ fputs(string, (bsl_stdout()));
+ numWarnings++;
+diff --git a/compiler/bootstrap/libec/bootstrap/expression.c b/compiler/bootstrap/libec/bootstrap/expression.c
+index 7b3897e..a3dd1c6 100644
+--- a/compiler/bootstrap/libec/bootstrap/expression.c
++++ b/compiler/bootstrap/libec/bootstrap/expression.c
+@@ -995,6 +995,10 @@ size_t fread(void * ptr, size_t size, size_t nmemb, FILE * stream);
+ 
+ size_t fwrite(const void * ptr, size_t size, size_t nmemb, FILE * stream);
+ 
++int vsnprintf(char *, size_t, const char *, ...);
++
++int snprintf(char * str, size_t, const char * format, ...);
++
+ int fseek(FILE * stream, long offset, int whence);
+ 
+ long ftell(FILE * stream);
+diff --git a/compiler/bootstrap/libec/bootstrap/grammar.c b/compiler/bootstrap/libec/bootstrap/grammar.c
+index e89c6be..132595e 100644
+--- a/compiler/bootstrap/libec/bootstrap/grammar.c
++++ b/compiler/bootstrap/libec/bootstrap/grammar.c
+@@ -1142,6 +1142,10 @@ size_t fread(void * ptr, size_t size, size_t nmemb, FILE * stream);
+ 
+ size_t fwrite(const void * ptr, size_t size, size_t nmemb, FILE * stream);
+ 
++int vsnprintf(char *, size_t, const char *, ...);
++
++int snprintf(char * str, size_t, const char * format, ...);
++
+ int fseek(FILE * stream, long offset, int whence);
+ 
+ long ftell(FILE * stream);
+diff --git a/compiler/bootstrap/libec/bootstrap/lexer.c b/compiler/bootstrap/libec/bootstrap/lexer.c
+index 4c58944..0a4c774 100644
+--- a/compiler/bootstrap/libec/bootstrap/lexer.c
++++ b/compiler/bootstrap/libec/bootstrap/lexer.c
+@@ -393,6 +393,10 @@ size_t fread(void * ptr, size_t size, size_t nmemb, FILE * stream);
+ 
+ size_t fwrite(const void * ptr, size_t size, size_t nmemb, FILE * stream);
+ 
++int vsnprintf(char *, size_t, const char *, ...);
++
++int snprintf(char * str, size_t, const char * format, ...);
++
+ int fseek(FILE * stream, long offset, int whence);
+ 
+ long ftell(FILE * stream);
+diff --git a/compiler/bootstrap/libec/bootstrap/type.c b/compiler/bootstrap/libec/bootstrap/type.c
+index 474b0ec..e8c999e 100644
+--- a/compiler/bootstrap/libec/bootstrap/type.c
++++ b/compiler/bootstrap/libec/bootstrap/type.c
+@@ -1023,6 +1023,10 @@ size_t fread(void * ptr, size_t size, size_t nmemb, FILE * stream);
+ 
+ size_t fwrite(const void * ptr, size_t size, size_t nmemb, FILE * stream);
+ 
++int vsnprintf(char *, size_t, const char *, ...);
++
++int snprintf(char * str, size_t, const char * format, ...);
++
+ int fseek(FILE * stream, long offset, int whence);
+ 
+ long ftell(FILE * stream);
+diff --git a/compiler/ecc/ecc.ec b/compiler/ecc/ecc.ec
+index de6ccd1..b216254 100644
+--- a/compiler/ecc/ecc.ec
++++ b/compiler/ecc/ecc.ec
+@@ -309,8 +309,8 @@ class CompilerApp : Application
+       else
+       {
+          DualPipe cppOutput;
+-         char command[1024];
+-
++         char command[MAX_F_STRING*3];
++         command[sizeof(command)-1] = 0;
+          SetGlobalData(&globalData);
+          SetExcludedSymbols(&_excludedSymbols);
+          SetGlobalContext(globalContext);
+@@ -337,8 +337,7 @@ class CompilerApp : Application
+             globalData.functions.Add((BTNode)data);
+          }
+ 
+-         sprintf(command, "%s%s -x c -E \"%s\"", cppCommand, cppOptions ? cppOptions : "", GetSourceFile());
+-
++         snprintf(command, sizeof(command), "%s%s -x c -E \"%s\"", cppCommand, cppOptions ? cppOptions : "", GetSourceFile());
+          if((cppOutput = DualPipeOpen({ output = true }, command)))
+          {
+             char impFile[MAX_LOCATION];
+diff --git a/compiler/ecp/ecp.ec b/compiler/ecp/ecp.ec
+index 2d27689..f5f5f28 100644
+--- a/compiler/ecp/ecp.ec
++++ b/compiler/ecp/ecp.ec
+@@ -1458,8 +1458,9 @@ class PrecompApp : Application
+          printf($"Syntax:\n   ecp [-t <target platform>] [-cpp <c preprocessor>] [-o <output>] [-symbols <outputdir>] [-I<includedir>]* [-isystem <sysincludedir>]* [-D<definition>]* -c <input>\n");
+       else
+       {
+-         char command[1024];
++         char command[MAX_F_STRING*3];
+          DualPipe cppOutput;
++         command[sizeof(command)-1] = 0;
+          
+          SetGlobalContext(globalContext);
+          SetTopContext(globalContext);
+@@ -1488,7 +1489,7 @@ class PrecompApp : Application
+                DeleteFile(outputFilePath);
+          }
+          
+-         sprintf(command, "%s%s -x c -E \"%s\"", cppCommand, cppOptions ? cppOptions : "", GetSourceFile());
++         snprintf(command, sizeof(command), "%s%s -x c -E \"%s\"", cppCommand, cppOptions ? cppOptions : "", GetSourceFile());
+ 
+          if((cppOutput = DualPipeOpen({ output = true }, command)))
+          {
+diff --git a/compiler/libec/src/ecdefs.ec b/compiler/libec/src/ecdefs.ec
+index 063e88c..1d7c635 100644
+--- a/compiler/libec/src/ecdefs.ec
++++ b/compiler/libec/src/ecdefs.ec
+@@ -1196,6 +1196,7 @@ void Compiler_Error(char * format, ...)
+       {
+          va_list args;
+          char string[10000];
++         string[sizeof(string)-1] = 0;
+ 
+          if(yylloc.start.included)
+          {
+@@ -1223,7 +1224,7 @@ void Compiler_Error(char * format, ...)
+          printf($":%d:%d: error: ", yylloc.start.line, yylloc.start.charPos);
+          //printf(":%d: error: ", yylloc.start.line);
+          va_start(args, format);
+-         vsprintf(string,format,args);
++         vsnprintf(string, sizeof(string), format, args);
+          va_end(args);
+          fputs(string, stdout);
+          __thisModule.application.exitCode = 1;
+@@ -1245,6 +1246,7 @@ void Compiler_Warning(char * format, ...)
+    {
+       va_list args;
+       char string[10000];
++      string[sizeof(string)-1] = 0;
+ 
+       if(yylloc.start.included)
+       {
+@@ -1263,7 +1265,7 @@ void Compiler_Warning(char * format, ...)
+       printf($":%d:%d: warning: ", yylloc.start.line, yylloc.start.charPos);
+       //printf(":%d: warning: ", yylloc.start.line);
+       va_start(args, format);
+-      vsprintf(string,format,args);
++      vsnprintf(string, sizeof(string), format, args);
+       va_end(args);
+       fputs(string, stdout);
+       numWarnings++;
+diff --git a/ecere/src/com/BTNode.ec b/ecere/src/com/BTNode.ec
+index 3d8dbaa..aded637 100644
+--- a/ecere/src/com/BTNode.ec
++++ b/ecere/src/com/BTNode.ec
+@@ -6,6 +6,7 @@ import "instance"
+ 
+ public enum TreePrintStyle { inOrder, postOrder, preOrder, depthOrder };
+ 
++// WARNING: This function has no boundary check!
+ public void strcatf(char * string, char * format, ...)
+ {
+    va_list args;
+diff --git a/ecere/src/com/String.ec b/ecere/src/com/String.ec
+index f05900f..105a41b 100644
+--- a/ecere/src/com/String.ec
++++ b/ecere/src/com/String.ec
+@@ -27,7 +27,7 @@ default extern Platform runtimePlatform;
+ public define DIR_SEP   = (GetRuntimePlatform() == win32) ? '\\' : '/';
+ public define DIR_SEPS  = (GetRuntimePlatform() == win32) ? "\\" : "/";
+ 
+-// Maximum length for a vsprintf string
++// Maximum length for a vsnprintf string
+ public define MAX_F_STRING = 1025;
+ 
+ // Maximum length for a directories and filenames strings
+diff --git a/ecere/src/com/instance.ec b/ecere/src/com/instance.ec
+index def94f4..8f2fb66 100644
+--- a/ecere/src/com/instance.ec
++++ b/ecere/src/com/instance.ec
+@@ -5947,8 +5947,12 @@ static void LoadCOM(Module module)
+ 
+    // --- Stdio ---
+    eSystem_RegisterFunction("sprintf", "int sprintf(char *, char *, ...)", sprintf, module, baseSystemAccess);
++   // TODO: Replace int with size_t when eC recognizes it for 64 bit port
++   eSystem_RegisterFunction("snprintf", "int sprintf(char *, int, char *, ...)", snprintf, module, baseSystemAccess);
+    eSystem_RegisterFunction("printf", "int printf(char *, ...)", printf, module, baseSystemAccess);
+    eSystem_RegisterFunction("vsprintf", "int vsprintf(char*, const char*, __builtin_va_list)", vsprintf, module, baseSystemAccess);
++   // TODO: Replace int with size_t when eC recognizes it for 64 bit port
++   eSystem_RegisterFunction("vsnprintf", "int vsnprintf(char*, int, const char*, __builtin_va_list)", vsnprintf, module, baseSystemAccess);
+    eSystem_RegisterFunction("puts", "int puts(char *)", puts, module, baseSystemAccess);
+    eSystem_RegisterFunction("fputs", "int fputs(char *, void * stream)", fputs, module, baseSystemAccess);
+ 
+diff --git a/ecere/src/gfx/Surface.ec b/ecere/src/gfx/Surface.ec
+index 1a4c201..14d0b64 100644
+--- a/ecere/src/gfx/Surface.ec
++++ b/ecere/src/gfx/Surface.ec
+@@ -293,8 +293,9 @@ public:
+       {
+          char text[MAX_F_STRING];
+          va_list args;
++         text[sizeof(text)-1] = 0;
+          va_start(args, format);
+-         vsprintf(text, format, args);
++         vsnprintf(text, sizeof(text), format, args);
+          driver.WriteText(display, this, x,y, text, strlen(text));
+          va_end(args);
+       }
+@@ -308,9 +309,9 @@ public:
+          va_list args;
+          int len;
+          int w, h;
+-
++         text[sizeof(text)-1] = 0;
+          va_start(args, format);
+-         vsprintf(text, format, args);
++         vsnprintf(text, sizeof(text), format, args);
+          len = strlen(text);
+ 
+          driver.TextExtent(display, this, text, len, &w, &h);
+@@ -366,8 +367,9 @@ public:
+       {
+          char text[MAX_F_STRING];
+          va_list args;
++         text[sizeof(text)-1] = 0;
+          va_start(args, format);
+-         vsprintf(text, format, args);
++         vsnprintf(text, sizeof(text), format, args);
+          WriteTextDots(alignment, x,y, width, text, strlen(text));
+          va_end(args);
+       }
+diff --git a/ecere/src/gui/Window.ec b/ecere/src/gui/Window.ec
+index c391fa3..e0e200b 100644
+--- a/ecere/src/gui/Window.ec
++++ b/ecere/src/gui/Window.ec
+@@ -6959,13 +6959,12 @@ public:
+          {
+             char caption[MAX_F_STRING];
+             va_list args;
++            caption[sizeof(caption)-1] = 0;
+             va_start(args, format);
+-            vsprintf(caption, format, args);
++            vsnprintf(caption, sizeof(caption), format, args);
+             va_end(args);
+ 
+-            this.caption = new char[strlen(caption)+1];
+-            if(this.caption)
+-               strcpy(this.caption, caption);
++            this.caption = CopyString(caption);
+          }
+          if(created)
+             UpdateCaption();
+diff --git a/ecere/src/gui/controls/DropBox.ec b/ecere/src/gui/controls/DropBox.ec
+index 00b009e..24648eb 100644
+--- a/ecere/src/gui/controls/DropBox.ec
++++ b/ecere/src/gui/controls/DropBox.ec
+@@ -247,9 +247,10 @@ public:
+ 
+          char string[MAX_F_STRING];
+          va_list args;
++         string[sizeof(string)-1] = 0;
+ 
+          va_start(args, format);
+-         vsprintf(string, format, args);
++         vsnprintf(string, sizeof(string), format, args);
+          va_end(args);
+ 
+          row = AddRow();
+diff --git a/ecere/src/gui/controls/EditBox.ec b/ecere/src/gui/controls/EditBox.ec
+index 7361a32..1761c5e 100644
+--- a/ecere/src/gui/controls/EditBox.ec
++++ b/ecere/src/gui/controls/EditBox.ec
+@@ -5304,8 +5304,9 @@ public:
+       {
+          char temp[MAX_F_STRING];
+          va_list args;
++         temp[sizeof(temp)-1] = 0;
+          va_start(args, format);
+-         vsprintf(temp, format, args);
++         vsnprintf(temp, sizeof(temp), format, args);
+          va_end(args);
+          PutS(temp);
+       }
+@@ -5321,8 +5322,9 @@ public:
+          {
+             char temp[MAX_F_STRING];
+             va_list args;
++            temp[sizeof(temp)-1] = 0;
+             va_start(args, format);
+-            vsprintf(temp, format, args);
++            vsnprintf(temp, sizeof(temp), format, args);
+             va_end(args);
+ 
+             AddS(temp);
+diff --git a/ecere/src/gui/controls/ListBox.ec b/ecere/src/gui/controls/ListBox.ec
+index e2cc5bc..bb9a96b 100644
+--- a/ecere/src/gui/controls/ListBox.ec
++++ b/ecere/src/gui/controls/ListBox.ec
+@@ -760,9 +760,9 @@ public:
+          DataRow row;
+          char string[MAX_F_STRING];
+          va_list args;
+-
++         string[sizeof(string)-1] = 0;
+          va_start(args, format);
+-         vsprintf(string, format, args);
++         vsnprintf(string, sizeof(string), format, args);
+          va_end(args);
+ 
+          row = AddRow();
+@@ -1450,9 +1450,10 @@ public:
+ 
+          char string[MAX_F_STRING];
+          va_list args;
++         string[sizeof(string)-1] = 0;
+ 
+          va_start(args, format);
+-         vsprintf(string, format ? format : "", args);
++         vsnprintf(string, sizeof(string), format ? format : "", args);
+          va_end(args);
+ 
+          row = AddRow();
+diff --git a/ecere/src/gui/controls/StatusBar.ec b/ecere/src/gui/controls/StatusBar.ec
+index 6e86709..8805b6c 100644
+--- a/ecere/src/gui/controls/StatusBar.ec
++++ b/ecere/src/gui/controls/StatusBar.ec
+@@ -211,21 +211,17 @@ public:
+    {
+       if(this)
+       {
++         delete text;
+          if(format)
+          {
+             char tempText[MAX_F_STRING];
+-            int len;
+             va_list args;
++            tempText[sizeof(tempText)-1] = 0;
+             va_start(args, format);
+-            vsprintf(tempText, format, args);
++            vsnprintf(tempText, sizeof(tempText), format, args);
+             va_end(args);
+-            len = strlen(tempText);
+-
+-            text = renew text char[len + 1];
+-            CopyBytes(text, tempText, len + 1);
++            text = CopyString(tempText);
+          }
+-         else
+-            delete text;
+          if(_statusBar)
+             _statusBar.Update(null);
+       }
+diff --git a/ecere/src/net/Socket.ec b/ecere/src/net/Socket.ec
+index c186ed8..e490077 100644
+--- a/ecere/src/net/Socket.ec
++++ b/ecere/src/net/Socket.ec
+@@ -358,8 +358,9 @@ public:
+       bool result;
+       va_list args;
+       char string[MAX_F_STRING];
++      string[sizeof(string)-1] = 0;
+       va_start(args, format);
+-      vsprintf(string,format,args);
++      vsnprintf(string, sizeof(string), format, args);
+       result = Send(string, strlen(string));
+       va_end(args);
+       return result;
+diff --git a/ecere/src/sys/DualPipe.ec b/ecere/src/sys/DualPipe.ec
+index 5fe3d04..4c4ef19 100644
+--- a/ecere/src/sys/DualPipe.ec
++++ b/ecere/src/sys/DualPipe.ec
+@@ -58,8 +58,9 @@ public DualPipe DualPipeOpenf(PipeOpenMode mode, char * command, ...)
+ {
+    char commandLine[MAX_F_STRING];
+    va_list args;
++   commandLine[sizeof(commandLine)-1] = 0;
+    va_start(args, command);
+-   vsprintf(commandLine, command, args);
++   vsnprintf(commandLine, sizeof(commandLine), command, args);
+    va_end(args);
+    return DualPipeOpen(mode, commandLine);
+ }
+@@ -77,8 +78,9 @@ public DualPipe DualPipeOpenEnvf(PipeOpenMode mode, char * env, char * command,
+ {
+    char commandLine[MAX_F_STRING];
+    va_list args;
++   commandLine[sizeof(commandLine)-1] = 0;
+    va_start(args, command);
+-   vsprintf(commandLine, command, args);
++   vsnprintf(commandLine, sizeof(commandLine), command, args);
+    va_end(args);
+    return DualPipeOpenEnv(mode, env, commandLine);
+ }
+diff --git a/ecere/src/sys/File.ec b/ecere/src/sys/File.ec
+index aaaa758..569075b 100644
+--- a/ecere/src/sys/File.ec
++++ b/ecere/src/sys/File.ec
+@@ -569,8 +569,9 @@ public:
+       {
+          char text[MAX_F_STRING];
+          va_list args;
++         text[sizeof(text)-1] = 0;
+          va_start(args, format);
+-         vsprintf(text, format, args);
++         vsnprintf(text, sizeof(text), format, args);
+          if(Puts(text))
+             result = strlen(text);
+          va_end(args);
+diff --git a/ecere/src/sys/System.c b/ecere/src/sys/System.c
+index fa01fdf..cd8bb5c 100644
+--- a/ecere/src/sys/System.c
++++ b/ecere/src/sys/System.c
+@@ -303,8 +303,9 @@ bool System_Execute(char * env, char * command, va_list args)
+ {
+    bool result = false;
+    char commandLine[MAX_F_STRING];
++   commandLine[sizeof(commandLine)-1] = 0;
++   vsnprintf(commandLine, sizeof(commandLine)-1, command, args);
+ 
+-   vsprintf(commandLine, command, args);
+ #ifndef __WIN32__
+    {
+       strcat(commandLine, "&");
+@@ -332,13 +333,14 @@ bool System_ShellOpen(char * fileName, va_list args)
+    bool result = false;
+    char filePath[MAX_F_STRING];
+    int len;
+-   
++   filePath[sizeof(filePath)-1] = 0;
+ #if defined(__WIN32__)
+    filePath[0] = '"';
+-   vsprintf(filePath+1, fileName, args);
++   vsnprintf(filePath+1, sizeof(filePath)-2,fileName, args);
+ #else
+-   vsprintf(filePath, fileName, args);
++   vsnprintf(filePath, sizeof(filePath), fileName, args);
+ #endif
++
+    len = strlen(filePath);
+ #if defined(__WIN32__)
+    filePath[len] = '"';
+diff --git a/ecere/src/sys/System.ec b/ecere/src/sys/System.ec
+index b5d4b10..2134867 100644
+--- a/ecere/src/sys/System.ec
++++ b/ecere/src/sys/System.ec
+@@ -204,8 +204,9 @@ public void Logf(char * format, ...)
+ {
+    va_list args;
+    char string[MAX_F_STRING];
++   string[sizeof(string)-1] = 0;
+    va_start(args, format);
+-   vsprintf(string,format,args);
++   vsnprintf(string, sizeof(string), format, args);
+    Log(string);
+    va_end(args);
+ }
+diff --git a/ide/src/debugger/Debugger.ec b/ide/src/debugger/Debugger.ec
+index c7469ce..6e65a96 100644
+--- a/ide/src/debugger/Debugger.ec
++++ b/ide/src/debugger/Debugger.ec
+@@ -740,8 +740,8 @@ class Debugger
+             {
+                char * s;
+                char title[MAX_LOCATION];
+-
+-               sprintf(title, $"Provide source file location for %s", (s = CopySystemPath(frame.file)));
++               title[sizeof(title)-1] = 0;
++               snprintf(title, sizeof(title), $"Provide source file location for %s", (s = CopySystemPath(frame.file)));
+                delete s;
+                if(SourceDirDialog(title, ide.workspace.projectDir, frame.file, sourceDir))
+                {
+@@ -810,12 +810,13 @@ class Debugger
+    {
+       bool returnedExitCode = false;
+       char verboseExitCode[128];
++      verboseExitCode[sizeof(verboseExitCode)-1] = 0;
+       
+       ChangeState(loaded); // this state change seems to be superfluous, might be in case of gdb crash
+       targetProcessId = 0;
+ 
+       if(code)
+-         sprintf(verboseExitCode, $" with exit code %s", code);
++         snprintf(verboseExitCode, sizeof(verboseExitCode), $" with exit code %s", code);
+       else
+          verboseExitCode[0] = '\0';
+       
+@@ -1223,8 +1224,9 @@ class Debugger
+          {
+             char title[MAX_LOCATION];
+             char directory[MAX_LOCATION];
++            title[sizeof(title)-1] = 0;
+             StripLastDirectory(absolutePath, directory);
+-            sprintf(title, $"Provide source files location directory for %s", absolutePath);
++            snprintf(title, sizeof(title), $"Provide source files location directory for %s", absolutePath);
+             while(true)
+             {
+                String srcDir = null;
+@@ -1424,11 +1426,11 @@ class Debugger
+    {
+       if(gdbHandle)
+       {
+-         char string[MAX_F_STRING];
+-         
++         static char string[MAX_F_STRING*3];
+          va_list args;
++         string[sizeof(string)-1] = 0;
+          va_start(args, format);
+-         vsprintf(string, format, args);
++         vsnprintf(string, sizeof(string), format, args);
+          va_end(args);
+          
+          gdbReady = false;
+@@ -1445,7 +1447,8 @@ class Debugger
+          if(ide.gdbDialog)
+             ide.gdbDialog.AddCommand(string);
+ #endif
+-         gdbHandle.Printf("%s\n", string);
++         strcat(string,"\n");
++         gdbHandle.Puts(string);
+          
+          if(focus)
+             Process_ShowWindows(targetProcessId);
+@@ -1523,8 +1526,9 @@ class Debugger
+                      int lineNumber;
+                      bool moduleLoadBlock = false;
+                      File f;
++                     name[sizeof(name)-1] = 0;
+                      ReplaceSpaces(fixedModuleName, ide.project.moduleName);
+-                     sprintf(name, "%s.main.ec", fixedModuleName);
++                     snprintf(name, sizeof(name),"%s.main.ec", fixedModuleName);
+                      strcpy(path, ide.workspace.projectDir);
+                      PathCatSlash(path, objDir.dir);
+                      PathCatSlash(path, name);
+@@ -1874,7 +1878,7 @@ class Debugger
+          SetEnvironment(e.name, e.string);
+       }
+ 
+-      sprintf(command, "gdb -n -silent --interpreter=mi2"); //-async //\"%s\"
++      strcpy(command, "gdb -n -silent --interpreter=mi2"); //-async //\"%s\"
+       gdbTimer.Start();
+       gdbHandle = DualPipeOpen(PipeOpenMode { output = 1, error = 2, input = 1 }, command);
+       if(!gdbHandle)
+@@ -2087,6 +2091,7 @@ class Debugger
+       if(wh.expression)
+       {
+          char watchmsg[MAX_F_STRING];
++         watchmsg[sizeof(watchmsg)-1] = 0;
+          if(state == stopped && !codeEditor)
+             wh.value = CopyString($"No source file found for selected frame");
+          //if(codeEditor && state == stopped || state != stopped)
+@@ -2259,11 +2264,11 @@ class Debugger
+                switch(exp.type)
+                {
+                   case symbolErrorExp:
+-                     sprintf(watchmsg, $"Symbol \"%s\" not found", exp.identifier.string);
++                     snprintf(watchmsg, sizeof(watchmsg), $"Symbol \"%s\" not found", exp.identifier.string);
+                      break;
+                   case structMemberSymbolErrorExp:
+                      // todo get info as in next case (ExpClassMemberSymbolError)
+-                     sprintf(watchmsg, $"Error: Struct member not found for \"%s\"", wh.expression);
++                     snprintf(watchmsg, sizeof(watchmsg), $"Error: Struct member not found for \"%s\"", wh.expression);
+                      break;
+                   case classMemberSymbolErrorExp:
+                      {
+@@ -2283,32 +2288,32 @@ class Debugger
+                               _class = classSym ? classSym.registered : null;
+                            }
+                            if(_class)
+-                              sprintf(watchmsg, $"Member \"%s\" not found in class \"%s\"", memberID ? memberID.string : "", _class.name);
++                              snprintf(watchmsg, sizeof(watchmsg), $"Member \"%s\" not found in class \"%s\"", memberID ? memberID.string : "", _class.name);
+                            else
+-                              sprintf(watchmsg, "Member \"%s\" not found in unregistered class? (Should never get this message)", memberID ? memberID.string : "");
++                              snprintf(watchmsg, sizeof(watchmsg), "Member \"%s\" not found in unregistered class? (Should never get this message)", memberID ? memberID.string : "");
+                         }
+                         else
+-                           sprintf(watchmsg, "Member \"%s\" not found in no type? (Should never get this message)", memberID ? memberID.string : "");
++                           snprintf(watchmsg, sizeof(watchmsg), "Member \"%s\" not found in no type? (Should never get this message)", memberID ? memberID.string : "");
+                      }
+                      break;
+                   case memoryErrorExp:
+                      // Need to ensure when set to memoryErrorExp, constant is set
+-                     sprintf(watchmsg, $"Memory can't be read at %s", /*(exp.type == constantExp) ? */exp.constant /*: null*/);
++                     snprintf(watchmsg, sizeof(watchmsg), $"Memory can't be read at %s", /*(exp.type == constantExp) ? */exp.constant /*: null*/);
+                      break;
+                   case dereferenceErrorExp:
+-                     sprintf(watchmsg, $"Dereference failure for \"%s\"", wh.expression);
++                     snprintf(watchmsg, sizeof(watchmsg), $"Dereference failure for \"%s\"", wh.expression);
+                      break;
+                   case unknownErrorExp:
+-                     sprintf(watchmsg, $"Unknown error for \"%s\"", wh.expression);
++                     snprintf(watchmsg, sizeof(watchmsg), $"Unknown error for \"%s\"", wh.expression);
+                      break;
+                   case noDebuggerErrorExp:
+-                     sprintf(watchmsg, $"Debugger required for symbol evaluation in \"%s\"", wh.expression);
++                     snprintf(watchmsg, sizeof(watchmsg), $"Debugger required for symbol evaluation in \"%s\"", wh.expression);
+                      break;
+                   case debugStateErrorExp:
+-                     sprintf(watchmsg, $"Incorrect debugger state for symbol evaluation in \"%s\"", wh.expression);
++                     snprintf(watchmsg, sizeof(watchmsg), $"Incorrect debugger state for symbol evaluation in \"%s\"", wh.expression);
+                      break;
+                   case 0:
+-                     sprintf(watchmsg, $"Null type for \"%s\"", wh.expression);
++                     snprintf(watchmsg, sizeof(watchmsg), $"Null type for \"%s\"", wh.expression);
+                      break;
+                   case constantExp:
+                   case stringExp:
+@@ -2329,6 +2334,7 @@ class Debugger
+                            //char temp[MAX_F_STRING * 32];
+ 
+                            ExpressionType evalError = dummyExp;
++                           value[sizeof(value)-1] = 0;
+                            /*if(exp.expType.kind == arrayType)
+                               sprintf(temp, "(char*)0x%x", exp.address);
+                            else
+@@ -2337,7 +2343,7 @@ class Debugger
+                            //evaluation = Debugger::EvaluateExpression(temp, &evalError);
+                            address = strtoul(exp.constant, null, 0);
+                            //printf("%x\n", address);
+-                           sprintf(value, "0x%08x ", address);
++                           snprintf(value, sizeof(value), "0x%08x ", address);
+                            
+                            if(!address)
+                               strcat(value, $"Null string");
+@@ -2407,6 +2413,7 @@ class Debugger
+                         int signedValue;
+                         char charString[5];
+                         char string[256];
++                        string[sizeof(string)-1] = 0;
+ 
+                         if(exp.constant[0] == '\'')
+                         {
+@@ -2447,24 +2454,24 @@ class Debugger
+                         charString[0] = 0;
+                         UTF32toUTF8Len(&value, 1, charString, 5);
+                         if(value == '\0')
+-                           sprintf(string, "\'\\0' (0)");
++                           snprintf(string, sizeof(string), "\'\\0' (0)");
+                         else if(value == '\t')
+-                           sprintf(string, "\'\\t' (%d)", value);
++                           snprintf(string, sizeof(string), "\'\\t' (%d)", value);
+                         else if(value == '\n')
+-                           sprintf(string, "\'\\n' (%d)", value);
++                           snprintf(string, sizeof(string), "\'\\n' (%d)", value);
+                         else if(value == '\r')
+-                           sprintf(string, "\'\\r' (%d)", value);
++                           snprintf(string, sizeof(string), "\'\\r' (%d)", value);
+                         else if(wh.type.kind == charType && wh.type.isSigned)
+-                           sprintf(string, "\'%s\' (%d)", charString, signedValue);
++                           snprintf(string, sizeof(string), "\'%s\' (%d)", charString, signedValue);
+                         else if(value > 256 || wh.type.kind != charType)
+                         {
+                            if(value > 0x10FFFF || !GetCharCategory(value))
+-                              sprintf(string, $"Invalid Unicode Keypoint (0x%08X)", value);
++                              snprintf(string, sizeof(string), $"Invalid Unicode Keypoint (0x%08X)", value);
+                            else
+-                              sprintf(string, "\'%s\' (U+%04X)", charString, value);
++                              snprintf(string, sizeof(string), "\'%s\' (U+%04X)", charString, value);
+                         }
+                         else
+-                           sprintf(string, "\'%s\' (%d)", charString, value);
++                           snprintf(string, sizeof(string), "\'%s\' (%d)", charString, value);
+                         
+                         wh.value = CopyString(string);
+                         result = true;
+@@ -2485,16 +2492,16 @@ class Debugger
+                      {
+                         char tempString[256];
+                         if(exp.member.memberType == propertyMember)
+-                           sprintf(watchmsg, $"Missing property evaluation support for \"%s\"", wh.expression);
++                           snprintf(watchmsg, sizeof(watchmsg), $"Missing property evaluation support for \"%s\"", wh.expression);
+                         else
+-                           sprintf(watchmsg, $"Evaluation failed for \"%s\" of type \"%s\"", wh.expression, 
++                           snprintf(watchmsg, sizeof(watchmsg), $"Evaluation failed for \"%s\" of type \"%s\"", wh.expression, 
+                                  exp.type.OnGetString(tempString, null, null));
+                      }
+                      break;
+                }
+             }
+             else
+-               sprintf(watchmsg, $"Invalid expression: \"%s\"", wh.expression);
++               snprintf(watchmsg, sizeof(watchmsg), $"Invalid expression: \"%s\"", wh.expression);
+             if(exp) FreeExpression(exp);
+ 
+             
+@@ -3790,7 +3797,8 @@ class Breakpoint : struct
+    char * LocationToString()
+    {
+       char location[MAX_LOCATION+20];
+-      sprintf(location, "%s:%d", relativeFilePath, line);
++      location[sizeof(location)-1] = 0;
++      snprintf(location, sizeof(location), "%s:%d", relativeFilePath, line);
+ #if defined(__WIN32__)
+       ChangeCh(location, '/', '\\');
+ #endif
+diff --git a/ide/src/designer/CodeEditor.ec b/ide/src/designer/CodeEditor.ec
+index b07d2c3..80c42d0 100644
+--- a/ide/src/designer/CodeEditor.ec
++++ b/ide/src/designer/CodeEditor.ec
+@@ -364,7 +364,6 @@ bool Code_IsPropertyModified(Instance test, ObjectInfo selected, Property prop)
+    if(prop.dataTypeString && (!prop.IsSet || prop.IsSet(selected.instance)))
+    {
+       Class dataType = prop.dataTypeClass;
+-      char string[1024] = "";
+ 
+       if(!dataType)
+          dataType = prop.dataTypeClass = eSystem_FindClass(test._class.module, prop.dataTypeString);
+@@ -915,7 +914,7 @@ class CodeEditor : Window
+ 
+                      membersLoc.end.charPos += after.x - Max(membersLoc.start.charPos, before.x);
+ 
+-                     for(c = membersLoc.start.charPos; c<membersLoc.end.charPos; c++)
++                     for(c = membersLoc.start.charPos; c<membersLoc.end.charPos && len < sizeof(string)-1; c++)
+                      {
+                         bool isSpace = (buffer[c] == ' ' || buffer[c] == '\t');
+                         if(!isalnum(buffer[c]) && buffer[c] != '_' && (!isSpace || !firstChar)) //|| membersList.currentRow
+@@ -1232,7 +1231,7 @@ class CodeEditor : Window
+ 
+                   if(before.x >= membersLoc.start.charPos)
+                   {
+-                     for(c = membersLoc.start.charPos; c<before.x; c++)
++                     for(c = membersLoc.start.charPos; c<before.x && len < sizeof(string)-1; c++)
+                      {
+                         bool isSpace = (buffer[c] == ' ' || buffer[c] == '\t');
+                         if(!isalnum(buffer[c]) && buffer[c] != '_' && (!isSpace || !firstChar))
+@@ -1264,7 +1263,7 @@ class CodeEditor : Window
+ 
+                   if(membersLoc.end.charPos >= after.x)
+                   {
+-                     for(c = after.x; c<membersLoc.end.charPos; c++)
++                     for(c = after.x; c<membersLoc.end.charPos && len < sizeof(string)-1; c++)
+                      {
+                         bool isSpace = (buffer[c] == ' ' || buffer[c] == '\t');
+                         if(!isalnum(buffer[c]) && buffer[c] != '_' && (!isSpace || !firstChar))
+@@ -2978,9 +2977,10 @@ class CodeEditor : Window
+                                                    // MOVED THIS UP NOW THAT char * IS A NORMAL CLASS
+                                                    else if(computed.type == stringExp && propertyClass.dataTypeString && strstr(propertyClass.dataTypeString, "char *"))
+                                                    {
+-                                                      char temp[1024];
++                                                      String temp = new char[strlen(computed.string)+1];
+                                                       ReadString(temp, computed.string);
+                                                       prop.Set(instance, temp);
++                                                      delete temp;
+                                                    }
+                                                    else
+                                                       propDef.variable = true;
+@@ -3004,9 +3004,10 @@ class CodeEditor : Window
+                                                       }
+                                                       else if(computed.type == stringExp && propertyClass.dataTypeString && strstr(propertyClass.dataTypeString, "char *"))
+                                                       {
+-                                                         char temp[1024];
++                                                         String temp = new char[strlen(computed.string)+1];
+                                                          ReadString(temp, computed.string);
+                                                          prop.Set(instance, temp);
++                                                         delete temp;
+                                                       }
+                                                    }
+                                                    else
+@@ -3265,9 +3266,10 @@ class CodeEditor : Window
+                                                                               // MOVED THIS UP NOW THAT char * IS A NORMAL CLASS
+                                                                               else if(computed.isConstant && computed.type == stringExp && propertyClass.dataTypeString && strstr(propertyClass.dataTypeString, "char *"))
+                                                                               {
+-                                                                                 char temp[1024];
++                                                                                 String temp = new char[strlen(computed.string)+1];
+                                                                                  ReadString(temp, computed.string);
+                                                                                  prop.Set(control, temp);
++                                                                                 delete temp;
+                                                                               }
+                                                                               else
+                                                                                  member.variable = true;
+@@ -3294,9 +3296,10 @@ class CodeEditor : Window
+                                                                                  }
+                                                                                  else if(computed.type == stringExp  && propertyClass.dataTypeString && strstr(propertyClass.dataTypeString, "char *"))
+                                                                                  {
+-                                                                                    char temp[1024];
++                                                                                    String temp = new char[strlen(computed.string)+1];
+                                                                                     ReadString(temp, computed.string);
+                                                                                     prop.Set(control, temp);
++                                                                                    delete temp;
+                                                                                  }
+                                                                               }
+                                                                               else
+diff --git a/ide/src/panels/CallStackView.ec b/ide/src/panels/CallStackView.ec
+index fb083a1..bf859b1 100644
+--- a/ide/src/panels/CallStackView.ec
++++ b/ide/src/panels/CallStackView.ec
+@@ -106,10 +106,10 @@ class CallStackView : Window
+    void Logf(char * format, ...)
+    {
+       char string[MAX_F_STRING*10];
+-
+       va_list args;
++      string[sizeof(string)-1] = 0;
+       va_start(args, format);
+-      vsprintf(string, format, args);
++      vsnprintf(string, sizeof(string), format, args);
+       va_end(args);
+ 
+       Log(string);
+diff --git a/ide/src/panels/OutputView.ec b/ide/src/panels/OutputView.ec
+index cc05a9e..4e20b22 100644
+--- a/ide/src/panels/OutputView.ec
++++ b/ide/src/panels/OutputView.ec
+@@ -293,10 +293,10 @@ class LogBox : EditBox
+    void Logf(char * format, ...)
+    {
+       char string[MAX_F_STRING*10];
+-
+       va_list args;
++      string[sizeof(string)-1] = 0;
+       va_start(args, format);
+-      vsprintf(string, format, args);
++      vsnprintf(string, sizeof(string), format, args);
+       va_end(args);
+ 
+       LogRaw(string);
+@@ -368,10 +368,10 @@ class LogBox : EditBox
+    void Tellf(char * format, ...)
+    {
+       char string[MAX_F_STRING*10];
+-
+       va_list args;
++      string[sizeof(string)-1] = 0;
+       va_start(args, format);
+-      vsprintf(string, format, args);
++      vsnprintf(string, sizeof(string), format, args);
+       va_end(args);
+ 
+       Tell(string);
+diff --git a/ide/src/panels/ThreadsView.ec b/ide/src/panels/ThreadsView.ec
+index 7882804..b51b93c 100644
+--- a/ide/src/panels/ThreadsView.ec
++++ b/ide/src/panels/ThreadsView.ec
+@@ -125,10 +125,10 @@ class ThreadsView : Window
+    void Logf(char * format, ...)
+    {
+       char string[MAX_F_STRING*10];
+-
+       va_list args;
++      string[sizeof(string)-1] = 0;
+       va_start(args, format);
+-      vsprintf(string, format, args);
++      vsnprintf(string, sizeof(string), format, args);
+       va_end(args);
+ 
+       Log(string);
+diff --git a/ide/src/project/Project.ec b/ide/src/project/Project.ec
+index 87632b1..8043150 100644
+--- a/ide/src/project/Project.ec
++++ b/ide/src/project/Project.ec
+@@ -1998,6 +1998,7 @@ private:
+             }
+             f.Printf("\nFORCE_64_BIT = %s", compiler.supportsBitDepth ? "-m64" : "");
+             f.Printf("\nFORCE_32_BIT = %s", compiler.supportsBitDepth ? "-m32" : "");
++            f.Printf("\n");
+ 
+             delete f;
+          }
+diff --git a/ide/src/project/Workspace.ec b/ide/src/project/Workspace.ec
+index 1368524..b1afb0e 100644
+--- a/ide/src/project/Workspace.ec
++++ b/ide/src/project/Workspace.ec
+@@ -250,13 +250,23 @@ public:
+          
+          file.Printf("\n   Execution Data\n");
+          if(commandLineArgs && commandLineArgs[0])
+-            file.Printf("\n      Command Line Arguments = %s\n", commandLineArgs);
++         {
++            file.Printf("\n      Command Line Arguments = ");
++            file.Puts(commandLineArgs);
++            file.Printf("\n");
++         }
+ 
+          if(environmentVars.count)
+          {
+             file.Printf("\n      Environment Variables\n\n");
+             for(v : environmentVars)
+-               file.Printf("       ~ %s = %s\n", v.name, v.string);
++            {
++               file.Printf("       ~ ");
++               file.Puts(v.name);
++               file.Printf(" = ");
++               file.Puts(v.string);
++               file.Printf("\n");
++            }
+          }
+ 
+          file.Printf("\n   Debugger Data\n");
+-- 
+1.7.9.5
+

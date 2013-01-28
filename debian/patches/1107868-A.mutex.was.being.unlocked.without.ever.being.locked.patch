@@ -1,0 +1,68 @@
+From 112192b5c53cad65edd19236b40281fec6aad645 Mon Sep 17 00:00:00 2001
+From: Jerome St-Louis <jerome@ecere.com>
+Date: Mon, 28 Jan 2013 05:20:09 -0500
+Subject: [PATCH 09/14] ecere/GuiApplication: Fixed unlocking mutex when it
+ has not been locked
+
+---
+ ecere/src/gui/GuiApplication.ec |   14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/ecere/src/gui/GuiApplication.ec b/ecere/src/gui/GuiApplication.ec
+index 8a83aff..105c00a 100644
+--- a/ecere/src/gui/GuiApplication.ec
++++ b/ecere/src/gui/GuiApplication.ec
+@@ -75,6 +75,8 @@ import "XInterface"
+ 
+ import "Window"
+ 
++bool guiApplicationInitialized = false;
++
+ GuiApplication guiApp;
+ int terminateX;
+ 
+@@ -220,8 +222,8 @@ public class GuiApplication : Application
+          XUnlockDisplay(xGlobalDisplay);
+ #endif
+ 
+-      lockMutex.Release();
+-
++      if(guiApplicationInitialized)
++         lockMutex.Release();
+       if(interfaceDriver)
+       {
+          interfaceDriver.Terminate();
+@@ -517,11 +519,9 @@ public class GuiApplication : Application
+ 
+    void Initialize(bool switchMode)
+    {
+-      static bool initialized = false;
+-      
+       // TODO:
+       // if(!initialized && eClass_IsDerived(__ecereModule->app->module.inst.class, guiApplicationClass))
+-      if(!initialized)
++      if(!guiApplicationInitialized)
+       {
+          char * defaultDriver = null;
+ #if defined(ECERE_VANILLA) || defined(ECERE_ONEDRIVER)
+@@ -534,7 +534,7 @@ public class GuiApplication : Application
+          GetEnvironment("ECERE_DRIVER", driverStorage, sizeof(driverStorage));
+          if(driverStorage[0]) driver = driverStorage;
+ #endif
+-         initialized = true;
++         guiApplicationInitialized = true;
+ 
+          fullScreenMode = true; // Needs to start at true for the desktop to resize
+          // Set this to true earlier so we can override it!
+@@ -626,7 +626,7 @@ public class GuiApplication : Application
+          #endif
+             }
+             if(!interfaceDriver)
+-               initialized = false;
++               guiApplicationInitialized = false;
+          }
+          else
+             defaultDisplayDriver = defaultDriver;
+-- 
+1.7.9.5
+
