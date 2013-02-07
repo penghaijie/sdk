@@ -54,14 +54,14 @@ msgstr "Alt+"
 #: ./src/gui/controls/Picture.ec:19
 #: ./src/gui/controls/Picture.ec:39
 #: ./src/gui/controls/ScrollBar.ec:82
-#: ./src/gui/Window.ec:8015
-#: ./src/gui/Window.ec:8062
-#: ./src/gui/Window.ec:8079
-#: ./src/gui/Window.ec:8090
-#: ./src/gui/Window.ec:8103
-#: ./src/gui/Window.ec:8486
-#: ./src/gui/Window.ec:9187
-#: ./src/gui/Window.ec:9508
+#: ./src/gui/Window.ec:8014
+#: ./src/gui/Window.ec:8061
+#: ./src/gui/Window.ec:8078
+#: ./src/gui/Window.ec:8089
+#: ./src/gui/Window.ec:8102
+#: ./src/gui/Window.ec:8485
+#: ./src/gui/Window.ec:9186
+#: ./src/gui/Window.ec:9507
 msgid "Appearance"
 msgstr "Appearance"
 
@@ -133,30 +133,30 @@ msgstr "August"
 #: ./src/gui/controls/ScrollBar.ec:127
 #: ./src/gui/controls/ScrollBar.ec:128
 #: ./src/gui/controls/ScrollBar.ec:129
-#: ./src/gui/Window.ec:7971
-#: ./src/gui/Window.ec:8034
-#: ./src/gui/Window.ec:8216
-#: ./src/gui/Window.ec:8263
-#: ./src/gui/Window.ec:8270
-#: ./src/gui/Window.ec:8277
-#: ./src/gui/Window.ec:8284
-#: ./src/gui/Window.ec:8291
-#: ./src/gui/Window.ec:8298
-#: ./src/gui/Window.ec:8305
-#: ./src/gui/Window.ec:8760
-#: ./src/gui/Window.ec:8787
-#: ./src/gui/Window.ec:8794
-#: ./src/gui/Window.ec:9038
-#: ./src/gui/Window.ec:9058
-#: ./src/gui/Window.ec:9064
-#: ./src/gui/Window.ec:9071
-#: ./src/gui/Window.ec:9081
-#: ./src/gui/Window.ec:9092
-#: ./src/gui/Window.ec:9099
-#: ./src/gui/Window.ec:9107
-#: ./src/gui/Window.ec:9180
-#: ./src/gui/Window.ec:9213
-#: ./src/gui/Window.ec:9229
+#: ./src/gui/Window.ec:7970
+#: ./src/gui/Window.ec:8033
+#: ./src/gui/Window.ec:8215
+#: ./src/gui/Window.ec:8262
+#: ./src/gui/Window.ec:8269
+#: ./src/gui/Window.ec:8276
+#: ./src/gui/Window.ec:8283
+#: ./src/gui/Window.ec:8290
+#: ./src/gui/Window.ec:8297
+#: ./src/gui/Window.ec:8304
+#: ./src/gui/Window.ec:8759
+#: ./src/gui/Window.ec:8786
+#: ./src/gui/Window.ec:8793
+#: ./src/gui/Window.ec:9037
+#: ./src/gui/Window.ec:9057
+#: ./src/gui/Window.ec:9063
+#: ./src/gui/Window.ec:9070
+#: ./src/gui/Window.ec:9080
+#: ./src/gui/Window.ec:9091
+#: ./src/gui/Window.ec:9098
+#: ./src/gui/Window.ec:9106
+#: ./src/gui/Window.ec:9179
+#: ./src/gui/Window.ec:9212
+#: ./src/gui/Window.ec:9228
 msgid "Behavior"
 msgstr "Behavior"
 
@@ -223,7 +223,7 @@ msgstr "Cut\tCtrl+X"
 #: ./src/gui/controls/EditBox.ec:755
 #: ./src/gui/controls/ProgressBar.ec:13
 #: ./src/gui/controls/ProgressBar.ec:14
-#: ./src/gui/Window.ec:9142
+#: ./src/gui/Window.ec:9141
 msgid "Data"
 msgstr "Data"
 
@@ -252,11 +252,11 @@ msgstr "Deleting control with children"
 msgid "Deleting control with code"
 msgstr "Deleting control with code"
 
-#: ./src/gui/Window.ec:9332
+#: ./src/gui/Window.ec:9331
 msgid "Deprecated"
 msgstr "Deprecated"
 
-#: ./src/gui/Window.ec:9199
+#: ./src/gui/Window.ec:9198
 msgid "Design"
 msgstr "Design"
 
@@ -276,9 +276,9 @@ msgstr "Directory doesn't exist"
 msgid "Directory:"
 msgstr "Directory:"
 
-#: ./src/gui/Window.ec:8974
-#: ./src/gui/Window.ec:9114
-#: ./src/gui/Window.ec:9149
+#: ./src/gui/Window.ec:8973
+#: ./src/gui/Window.ec:9113
+#: ./src/gui/Window.ec:9148
 msgid "Document"
 msgstr "Document"
 
@@ -286,11 +286,11 @@ msgstr "Document"
 msgid "Down"
 msgstr "Down"
 
-#: ./src/gui/GuiApplication.ec:96
+#: ./src/gui/GuiApplication.ec:98
 msgid "Driver/Mode switch failed"
 msgstr "Driver/Mode switch failed"
 
-#: ./src/gui/GuiApplication.ec:192
+#: ./src/gui/GuiApplication.ec:194
 msgid "ECERE Application"
 msgstr "ECERE Application"
 
@@ -306,8 +306,8 @@ msgstr "Entire Computer"
 msgid "Error falling back to previous video mode.\n"
 msgstr "Error falling back to previous video mode.\n"
 
-#: ./src/gui/Window.ec:7247
-#: ./src/gui/Window.ec:7295
+#: ./src/gui/Window.ec:7246
+#: ./src/gui/Window.ec:7294
 msgid "Error writing file"
 msgstr "Error writing file"
 
@@ -394,7 +394,7 @@ msgstr "Go To Line..."
 msgid "Go To...\tCtrl+G"
 msgstr "Go To...\tCtrl+G"
 
-#: ./src/gui/GuiApplication.ec:92
+#: ./src/gui/GuiApplication.ec:94
 msgid "Graphics driver not supported by any user interface system"
 msgstr "Graphics driver not supported by any user interface system"
 
@@ -446,16 +446,16 @@ msgstr "Jun"
 msgid "June"
 msgstr "June"
 
-#: ./src/gui/Window.ec:7747
-#: ./src/gui/Window.ec:8129
-#: ./src/gui/Window.ec:8136
-#: ./src/gui/Window.ec:8204
-#: ./src/gui/Window.ec:8543
-#: ./src/gui/Window.ec:8579
-#: ./src/gui/Window.ec:8616
-#: ./src/gui/Window.ec:8648
-#: ./src/gui/Window.ec:8715
-#: ./src/gui/Window.ec:9245
+#: ./src/gui/Window.ec:7746
+#: ./src/gui/Window.ec:8128
+#: ./src/gui/Window.ec:8135
+#: ./src/gui/Window.ec:8203
+#: ./src/gui/Window.ec:8542
+#: ./src/gui/Window.ec:8578
+#: ./src/gui/Window.ec:8615
+#: ./src/gui/Window.ec:8647
+#: ./src/gui/Window.ec:8714
+#: ./src/gui/Window.ec:9244
 msgid "Layout"
 msgstr "Layout"
 
@@ -538,7 +538,7 @@ msgid "No"
 msgstr "No"
 
 #: ./src/sys/System.ec:104
-#: ./src/gui/GuiApplication.ec:91
+#: ./src/gui/GuiApplication.ec:93
 msgid "No error"
 msgstr "No error"
 
@@ -641,7 +641,7 @@ msgstr "Sat"
 msgid "Saturday"
 msgstr "Saturday"
 
-#: ./src/gui/Window.ec:7277
+#: ./src/gui/Window.ec:7276
 msgid "Save As"
 msgstr "Save As"
 
@@ -649,16 +649,16 @@ msgstr "Save As"
 msgid "Save As..."
 msgstr "Save As..."
 
-#: ./src/gui/Window.ec:7247
-#: ./src/gui/Window.ec:7295
+#: ./src/gui/Window.ec:7246
+#: ./src/gui/Window.ec:7294
 msgid "Save as a different file?"
 msgstr "Save as a different file?"
 
-#: ./src/gui/Window.ec:7160
+#: ./src/gui/Window.ec:7159
 msgid "Save changes to %s?"
 msgstr "Save changes to %s?"
 
-#: ./src/gui/Window.ec:7162
+#: ./src/gui/Window.ec:7161
 msgid "Save changes to Untitled %d?"
 msgstr "Save changes to Untitled %d?"
 
@@ -836,26 +836,26 @@ msgstr "Whole File"
 msgid "Whole word only"
 msgstr "Whole word only"
 
-#: ./src/gui/Window.ec:8143
-#: ./src/gui/Window.ec:8164
-#: ./src/gui/Window.ec:8185
-#: ./src/gui/Window.ec:8334
-#: ./src/gui/Window.ec:8341
-#: ./src/gui/Window.ec:8377
-#: ./src/gui/Window.ec:8398
-#: ./src/gui/Window.ec:8451
-#: ./src/gui/Window.ec:8981
-#: ./src/gui/Window.ec:8988
-#: ./src/gui/Window.ec:9013
-#: ./src/gui/Window.ec:9173
+#: ./src/gui/Window.ec:8142
+#: ./src/gui/Window.ec:8163
+#: ./src/gui/Window.ec:8184
+#: ./src/gui/Window.ec:8333
+#: ./src/gui/Window.ec:8340
+#: ./src/gui/Window.ec:8376
+#: ./src/gui/Window.ec:8397
+#: ./src/gui/Window.ec:8450
+#: ./src/gui/Window.ec:8980
+#: ./src/gui/Window.ec:8987
+#: ./src/gui/Window.ec:9012
+#: ./src/gui/Window.ec:9172
 msgid "Window Style"
 msgstr "Window Style"
 
-#: ./src/gui/GuiApplication.ec:93
+#: ./src/gui/GuiApplication.ec:95
 msgid "Window creation failed"
 msgstr "Window creation failed"
 
-#: ./src/gui/GuiApplication.ec:94
+#: ./src/gui/GuiApplication.ec:96
 msgid "Window graphics loading failed"
 msgstr "Window graphics loading failed"
 
@@ -868,7 +868,7 @@ msgstr "Windows"
 msgid "Yes"
 msgstr "Yes"
 
-#: ./src/sys/System.ec:347
+#: ./src/sys/System.ec:348
 msgid "\n\nWould you like to view the error log?"
 msgstr "\n\nWould you like to view the error log?"
 

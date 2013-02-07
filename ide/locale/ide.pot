@@ -10,7 +10,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-Basepath: ../\n"
 
-#: ./src/project/Project.ec:1361
+#: ./src/project/Project.ec:1396
 msgid "   %s: No such file or directory\n"
 msgstr "   %s: No such file or directory\n"
 
@@ -50,7 +50,7 @@ msgstr " compiler configuration?"
 msgid " configuration?"
 msgstr " configuration?"
 
-#: ./src/designer/CodeEditor.ec:1380
+#: ./src/designer/CodeEditor.ec:1379
 msgid " file is not part of any project.\n"
 msgstr " file is not part of any project.\n"
 
@@ -58,7 +58,7 @@ msgstr " file is not part of any project.\n"
 msgid " was "
 msgstr " was "
 
-#: ./src/debugger/Debugger.ec:818
+#: ./src/debugger/Debugger.ec:821
 msgid " with exit code %s"
 msgstr " with exit code %s"
 
@@ -74,19 +74,19 @@ msgstr "%s - %s%smakefile for %s config...\n"
 msgid "%s Compiler\n"
 msgstr "%s Compiler\n"
 
-#: ./src/debugger/Debugger.ec:2877
+#: ./src/debugger/Debugger.ec:2886
 msgid "%s Constructor, %s:%d\n"
 msgstr "%s Constructor, %s:%d\n"
 
-#: ./src/debugger/Debugger.ec:2879
+#: ./src/debugger/Debugger.ec:2888
 msgid "%s Destructor, %s:%d\n"
 msgstr "%s Destructor, %s:%d\n"
 
-#: ./src/debugger/Debugger.ec:2881
+#: ./src/debugger/Debugger.ec:2890
 msgid "%s Function, %s:%d\n"
 msgstr "%s Function, %s:%d\n"
 
-#: ./src/debugger/Debugger.ec:2873
+#: ./src/debugger/Debugger.ec:2882
 msgid "%s Method, %s:%d\n"
 msgstr "%s Method, %s:%d\n"
 
@@ -94,7 +94,7 @@ msgstr "%s Method, %s:%d\n"
 msgid "%s Project"
 msgstr "%s Project"
 
-#: ./src/debugger/Debugger.ec:2875
+#: ./src/debugger/Debugger.ec:2884
 msgid "%s Property, %s:%d\n"
 msgstr "%s Property, %s:%d\n"
 
@@ -280,8 +280,8 @@ msgstr "Arrange Icons"
 msgid "Attach"
 msgstr "Attach"
 
-#: ./src/designer/CodeEditor.ec:5153
-#: ./src/designer/CodeEditor.ec:5194
+#: ./src/designer/CodeEditor.ec:5156
+#: ./src/designer/CodeEditor.ec:5197
 msgid "Attach %s"
 msgstr "Attach %s"
 
@@ -337,7 +337,7 @@ msgstr "Build project"
 msgid "Builder"
 msgstr "Builder"
 
-#: ./src/project/Project.ec:1438
+#: ./src/project/Project.ec:1473
 msgid "Building library...\n"
 msgstr "Building library...\n"
 
@@ -385,7 +385,7 @@ msgstr "Call Stack"
 #: ./src/dialogs/NewProjectDialog.ec:210
 #: ./src/dialogs/NewProjectDialog.ec:530
 #: ./src/dialogs/ProjectActiveConfig.ec:57
-#: ./src/designer/CodeEditor.ec:5225
+#: ./src/designer/CodeEditor.ec:5228
 #: ./src/ProjectSettings.ec:172
 msgid "Cancel"
 msgstr "Cancel"
@@ -485,7 +485,7 @@ msgstr "Compiling single file %s in project %s using the %s configuration...\n"
 msgid "Compiling single file %s in project %s...\n"
 msgstr "Compiling single file %s in project %s...\n"
 
-#: ./src/project/Project.ec:1409
+#: ./src/project/Project.ec:1444
 msgid "Compiling...\n"
 msgstr "Compiling...\n"
 
@@ -522,7 +522,7 @@ msgstr "Copy"
 msgid "Couldn't create file."
 msgstr "Couldn't create file."
 
-#: ./src/debugger/Debugger.ec:2382
+#: ./src/debugger/Debugger.ec:2390
 msgid "Couldn't read memory"
 msgstr "Couldn't read memory"
 
@@ -539,7 +539,7 @@ msgstr "Create Form"
 msgid "Create directory?"
 msgstr "Create directory?"
 
-#: ./src/designer/CodeEditor.ec:1886
+#: ./src/designer/CodeEditor.ec:1885
 #: ./src/ide.ec:980
 msgid "Debug"
 msgstr "Debug"
@@ -552,23 +552,23 @@ msgstr "Debug Working Directory"
 msgid "Debuggable"
 msgstr "Debuggable"
 
-#: ./src/debugger/Debugger.ec:3328
+#: ./src/debugger/Debugger.ec:3337
 msgid "Debugger Error: No target process ID\n"
 msgstr "Debugger Error: No target process ID\n"
 
-#: ./src/debugger/Debugger.ec:1893
+#: ./src/debugger/Debugger.ec:1899
 msgid "Debugger Fatal Error: Couldn't get GDB process ID\n"
 msgstr "Debugger Fatal Error: Couldn't get GDB process ID\n"
 
-#: ./src/debugger/Debugger.ec:1882
+#: ./src/debugger/Debugger.ec:1888
 msgid "Debugger Fatal Error: Couldn't start GDB\n"
 msgstr "Debugger Fatal Error: Couldn't start GDB\n"
 
-#: ./src/debugger/Debugger.ec:2678
+#: ./src/debugger/Debugger.ec:2687
 msgid "Debugger Fatal Error: GDB lost\n"
 msgstr "Debugger Fatal Error: GDB lost\n"
 
-#: ./src/debugger/Debugger.ec:2305
+#: ./src/debugger/Debugger.ec:2312
 msgid "Debugger required for symbol evaluation in \"%s\""
 msgstr "Debugger required for symbol evaluation in \"%s\""
 
@@ -576,17 +576,17 @@ msgstr "Debugger required for symbol evaluation in \"%s\""
 msgid "Debugging compressed applications is not supported\n"
 msgstr "Debugging compressed applications is not supported\n"
 
-#: ./src/debugger/Debugger.ec:1998
-#: ./src/debugger/Debugger.ec:2679
-#: ./src/debugger/Debugger.ec:3345
+#: ./src/debugger/Debugger.ec:2004
+#: ./src/debugger/Debugger.ec:2688
+#: ./src/debugger/Debugger.ec:3354
 msgid "Debugging stopped\n"
 msgstr "Debugging stopped\n"
 
-#: ./src/dialogs/GlobalSettingsDialog.ec:1109
+#: ./src/dialogs/GlobalSettingsDialog.ec:1128
 msgid "Default Compiler"
 msgstr "Default Compiler"
 
-#: ./src/dialogs/GlobalSettingsDialog.ec:1074
+#: ./src/dialogs/GlobalSettingsDialog.ec:1093
 msgid "Default Intermediate Objects Directory"
 msgstr "Default Intermediate Objects Directory"
 
@@ -594,7 +594,7 @@ msgstr "Default Intermediate Objects Directory"
 msgid "Default Name Space"
 msgstr "Default Name Space"
 
-#: ./src/dialogs/GlobalSettingsDialog.ec:1061
+#: ./src/dialogs/GlobalSettingsDialog.ec:1080
 msgid "Default Target Directory"
 msgstr "Default Target Directory"
 
@@ -616,11 +616,11 @@ msgstr "Delete %s"
 msgid "Delete Folder"
 msgstr "Delete Folder"
 
-#: ./src/project/Project.ec:1759
+#: ./src/project/Project.ec:1794
 msgid "Deleting target and object files..."
 msgstr "Deleting target and object files..."
 
-#: ./src/debugger/Debugger.ec:2299
+#: ./src/debugger/Debugger.ec:2306
 msgid "Dereference failure for \"%s\""
 msgstr "Dereference failure for \"%s\""
 
@@ -657,7 +657,7 @@ msgstr "Do you want to quickly create a temporary project?"
 msgid "Do you want to terminate the debugging session in progress?"
 msgstr "Do you want to terminate the debugging session in progress?"
 
-#: ./src/designer/CodeEditor.ec:2193
+#: ./src/designer/CodeEditor.ec:2192
 #: ./src/ide.ec:1520
 msgid "Document has been modified"
 msgstr "Document has been modified"
@@ -690,7 +690,7 @@ msgstr "Edit"
 msgid "Editor"
 msgstr "Editor"
 
-#: ./src/debugger/Debugger.ec:2378
+#: ./src/debugger/Debugger.ec:2386
 msgid "Empty string"
 msgstr "Empty string"
 
@@ -707,7 +707,7 @@ msgstr "Environment Variables"
 msgid "Error creating directory"
 msgstr "Error creating directory"
 
-#: ./src/project/Project.ec:1707
+#: ./src/project/Project.ec:1742
 msgid "Error executing make (%s) command\n"
 msgstr "Error executing make (%s) command\n"
 
@@ -728,11 +728,11 @@ msgstr "Error opening project file"
 msgid "Error writing project file"
 msgstr "Error writing project file"
 
-#: ./src/debugger/Debugger.ec:2266
+#: ./src/debugger/Debugger.ec:2273
 msgid "Error: Struct member not found for \"%s\""
 msgstr "Error: Struct member not found for \"%s\""
 
-#: ./src/debugger/Debugger.ec:2490
+#: ./src/debugger/Debugger.ec:2499
 msgid "Evaluation failed for \"%s\" of type \"%s\""
 msgstr "Evaluation failed for \"%s\" of type \"%s\""
 
@@ -762,12 +762,12 @@ msgstr "Exit"
 msgid "Expression"
 msgstr "Expression"
 
-#: ./src/project/Project.ec:1562
+#: ./src/project/Project.ec:1597
 msgid "Fatal Error: child process terminated unexpectedly\n"
 msgstr "Fatal Error: child process terminated unexpectedly\n"
 
 #: ./src/project/ProjectView.ec:441
-#: ./src/designer/CodeEditor.ec:1882
+#: ./src/designer/CodeEditor.ec:1881
 #: ./src/designer/Designer.ec:150
 #: ./src/documents/PictureEdit.ec:53
 #: ./src/ide.ec:594
@@ -794,7 +794,7 @@ msgstr "File doesn't exist. Create?"
 msgid "File name:"
 msgstr "File name:"
 
-#: ./src/designer/CodeEditor.ec:1382
+#: ./src/designer/CodeEditor.ec:1381
 msgid "File not in project error"
 msgstr "File not in project error"
 
@@ -802,7 +802,7 @@ msgstr "File not in project error"
 msgid "File with same name already in project."
 msgstr "File with same name already in project."
 
-#: ./src/project/Workspace.ec:1150
+#: ./src/project/Workspace.ec:1160
 msgid "File%s not found"
 msgstr "File%s not found"
 
@@ -902,7 +902,7 @@ msgstr "Generating Visual Studio Project..."
 msgid "Generating Visual Studio Solution..."
 msgstr "Generating Visual Studio Solution..."
 
-#: ./src/project/Project.ec:1414
+#: ./src/project/Project.ec:1449
 msgid "Generating symbols...\n"
 msgstr "Generating symbols...\n"
 
@@ -986,7 +986,7 @@ msgstr "Include Files"
 msgid "Include Subdirectories"
 msgstr "Include Subdirectories"
 
-#: ./src/debugger/Debugger.ec:2308
+#: ./src/debugger/Debugger.ec:2315
 msgid "Incorrect debugger state for symbol evaluation in \"%s\""
 msgstr "Incorrect debugger state for symbol evaluation in \"%s\""
 
@@ -1002,26 +1002,26 @@ msgstr "Initializing Debugger"
 msgid "Intermediate Objects Directory"
 msgstr "Intermediate Objects Directory"
 
-#: ./src/debugger/Debugger.ec:2400
+#: ./src/debugger/Debugger.ec:2408
 msgid "Invalid Enum Value"
 msgstr "Invalid Enum Value"
 
-#: ./src/debugger/Debugger.ec:1119
-#: ./src/debugger/Debugger.ec:1135
-#: ./src/debugger/Debugger.ec:1148
-#: ./src/debugger/Debugger.ec:1253
+#: ./src/debugger/Debugger.ec:1122
+#: ./src/debugger/Debugger.ec:1138
+#: ./src/debugger/Debugger.ec:1151
+#: ./src/debugger/Debugger.ec:1257
 msgid "Invalid Source Directory"
 msgstr "Invalid Source Directory"
 
-#: ./src/debugger/Debugger.ec:2462
+#: ./src/debugger/Debugger.ec:2471
 msgid "Invalid Unicode Keypoint (0x%08X)"
 msgstr "Invalid Unicode Keypoint (0x%08X)"
 
-#: ./src/debugger/Debugger.ec:2497
+#: ./src/debugger/Debugger.ec:2506
 msgid "Invalid expression: \"%s\""
 msgstr "Invalid expression: \"%s\""
 
-#: ./src/designer/CodeEditor.ec:1381
+#: ./src/designer/CodeEditor.ec:1380
 msgid "It can't be compiled."
 msgstr "It can't be compiled."
 
@@ -1053,7 +1053,7 @@ msgstr "License"
 msgid "Linker"
 msgstr "Linker"
 
-#: ./src/project/Project.ec:1474
+#: ./src/project/Project.ec:1509
 msgid "Linker Error"
 msgstr "Linker Error"
 
@@ -1061,12 +1061,12 @@ msgstr "Linker Error"
 msgid "Linker Options"
 msgstr "Linker Options"
 
-#: ./src/project/Project.ec:1427
+#: ./src/project/Project.ec:1462
 msgid "Linking...\n"
 msgstr "Linking...\n"
 
-#: ./src/designer/CodeEditor.ec:678
-#: ./src/designer/CodeEditor.ec:715
+#: ./src/designer/CodeEditor.ec:677
+#: ./src/designer/CodeEditor.ec:714
 msgid "Ln %d, Col %d"
 msgstr "Ln %d, Col %d"
 
@@ -1088,11 +1088,11 @@ msgstr "Makefile doesn't exist. "
 msgid "Match case"
 msgstr "Match case"
 
-#: ./src/debugger/Debugger.ec:2286
+#: ./src/debugger/Debugger.ec:2293
 msgid "Member \"%s\" not found in class \"%s\""
 msgstr "Member \"%s\" not found in class \"%s\""
 
-#: ./src/debugger/Debugger.ec:2296
+#: ./src/debugger/Debugger.ec:2303
 msgid "Memory can't be read at %s"
 msgstr "Memory can't be read at %s"
 
@@ -1100,8 +1100,8 @@ msgstr "Memory can't be read at %s"
 msgid "MemoryGuard"
 msgstr "MemoryGuard"
 
-#: ./src/designer/CodeEditor.ec:5154
-#: ./src/designer/CodeEditor.ec:5196
+#: ./src/designer/CodeEditor.ec:5157
+#: ./src/designer/CodeEditor.ec:5199
 msgid "Method is unused. Move method inside instance?"
 msgstr "Method is unused. Move method inside instance?"
 
@@ -1133,7 +1133,7 @@ msgstr "Microsoft Visual Studio 2010 (10.0) Compiler"
 msgid "Misc"
 msgstr "Misc"
 
-#: ./src/debugger/Debugger.ec:2488
+#: ./src/debugger/Debugger.ec:2497
 msgid "Missing property evaluation support for \"%s\""
 msgstr "Missing property evaluation support for \"%s\""
 
@@ -1161,7 +1161,7 @@ msgstr "Name"
 msgid "Name Conflict"
 msgstr "Name Conflict"
 
-#: ./src/designer/CodeEditor.ec:5221
+#: ./src/designer/CodeEditor.ec:5224
 msgid "Name detached method"
 msgstr "Name detached method"
 
@@ -1206,11 +1206,11 @@ msgstr "Next"
 msgid "No Line Numbers"
 msgstr "No Line Numbers"
 
-#: ./src/debugger/Debugger.ec:1258
+#: ./src/debugger/Debugger.ec:1262
 msgid "No Source Directory Provided"
 msgstr "No Source Directory Provided"
 
-#: ./src/debugger/Debugger.ec:2091
+#: ./src/debugger/Debugger.ec:2098
 msgid "No source file found for selected frame"
 msgstr "No source file found for selected frame"
 
@@ -1227,11 +1227,11 @@ msgstr "Normal"
 msgid "Nothing to be found. Please specify at least one criteria."
 msgstr "Nothing to be found. Please specify at least one criteria."
 
-#: ./src/debugger/Debugger.ec:2343
+#: ./src/debugger/Debugger.ec:2351
 msgid "Null string"
 msgstr "Null string"
 
-#: ./src/debugger/Debugger.ec:2311
+#: ./src/debugger/Debugger.ec:2318
 msgid "Null type for \"%s\""
 msgstr "Null type for \"%s\""
 
@@ -1245,7 +1245,7 @@ msgstr "Number of parallel build jobs"
 #: ./src/dialogs/NewProjectDialog.ec:34
 #: ./src/dialogs/NewProjectDialog.ec:347
 #: ./src/dialogs/ProjectActiveConfig.ec:39
-#: ./src/designer/CodeEditor.ec:5230
+#: ./src/designer/CodeEditor.ec:5233
 #: ./src/about.ec:34
 #: ./src/ProjectSettings.ec:211
 msgid "OK"
@@ -1370,7 +1370,7 @@ msgctxt "Menu"
 msgid "Project"
 msgstr "Project"
 
-#: ./src/dialogs/GlobalSettingsDialog.ec:1055
+#: ./src/dialogs/GlobalSettingsDialog.ec:1074
 #: ./src/dialogs/ProjectTabSettings.ec:8
 msgid "Project"
 msgstr "Project"
@@ -1428,7 +1428,7 @@ msgstr "Project Settings"
 msgid "Project View"
 msgstr "Project View"
 
-#: ./src/project/Project.ec:800
+#: ./src/project/Project.ec:825
 msgid "Project has been modified"
 msgstr "Project has been modified"
 
@@ -1453,11 +1453,11 @@ msgstr "Properties.."
 msgid "Properties..."
 msgstr "Properties..."
 
-#: ./src/debugger/Debugger.ec:744
+#: ./src/debugger/Debugger.ec:746
 msgid "Provide source file location for %s"
 msgstr "Provide source file location for %s"
 
-#: ./src/debugger/Debugger.ec:1227
+#: ./src/debugger/Debugger.ec:1231
 msgid "Provide source files location directory for %s"
 msgstr "Provide source files location directory for %s"
 
@@ -1589,12 +1589,12 @@ msgstr "Resume"
 msgid "Run"
 msgstr "Run"
 
-#: ./src/designer/CodeEditor.ec:1889
+#: ./src/designer/CodeEditor.ec:1888
 #: ./src/ide.ec:1070
 msgid "Run To Cursor"
 msgstr "Run To Cursor"
 
-#: ./src/designer/CodeEditor.ec:1909
+#: ./src/designer/CodeEditor.ec:1908
 #: ./src/ide.ec:1092
 msgid "Run To Cursor Skipping Breakpoints"
 msgstr "Run To Cursor Skipping Breakpoints"
@@ -1605,7 +1605,7 @@ msgstr "Same Project"
 
 #: ./src/project/ProjectView.ec:244
 #: ./src/project/ProjectView.ec:442
-#: ./src/designer/CodeEditor.ec:1883
+#: ./src/designer/CodeEditor.ec:1882
 #: ./src/designer/Designer.ec:153
 #: ./src/documents/PictureEdit.ec:54
 #: ./src/ide.ec:647
@@ -1616,7 +1616,7 @@ msgstr "Save"
 msgid "Save All"
 msgstr "Save All"
 
-#: ./src/designer/CodeEditor.ec:1884
+#: ./src/designer/CodeEditor.ec:1883
 #: ./src/designer/Designer.ec:161
 #: ./src/documents/PictureEdit.ec:55
 #: ./src/ide.ec:658
@@ -1709,7 +1709,7 @@ msgstr "Sheet"
 msgid "Show line numbers in code editor"
 msgstr "Show line numbers in code editor"
 
-#: ./src/debugger/Debugger.ec:514
+#: ./src/debugger/Debugger.ec:516
 msgid "Signal received: %s - %s\n"
 msgstr "Signal received: %s - %s\n"
 
@@ -1733,10 +1733,10 @@ msgstr "Start"
 msgid "Starting Debug"
 msgstr "Starting Debug"
 
-#: ./src/debugger/Debugger.ec:891
-#: ./src/debugger/Debugger.ec:911
-#: ./src/debugger/Debugger.ec:955
-#: ./src/debugger/Debugger.ec:1838
+#: ./src/debugger/Debugger.ec:894
+#: ./src/debugger/Debugger.ec:914
+#: ./src/debugger/Debugger.ec:958
+#: ./src/debugger/Debugger.ec:1844
 msgid "Starting debug mode\n"
 msgstr "Starting debug mode\n"
 
@@ -1779,12 +1779,16 @@ msgstr "Stop"
 msgid "Strict Name Spaces"
 msgstr "Strict Name Spaces"
 
-#: ./src/debugger/Debugger.ec:2262
+#: ./src/dialogs/GlobalSettingsDialog.ec:995
+msgid "Supports forcing bit depth"
+msgstr "Supports forcing bit depth"
+
+#: ./src/debugger/Debugger.ec:2269
 msgid "Symbol \"%s\" not found"
 msgstr "Symbol \"%s\" not found"
 
+#: ./src/designer/CodeEditor.ec:655
 #: ./src/designer/CodeEditor.ec:656
-#: ./src/designer/CodeEditor.ec:657
 #: ./src/designer/Sheet.ec:398
 #: ./src/designer/Sheet.ec:427
 #: ./src/designer/Sheet.ec:597
@@ -1816,11 +1820,11 @@ msgstr "Target Platform"
 msgid "Target Type"
 msgstr "Target Type"
 
-#: ./src/project/Project.ec:1763
+#: ./src/project/Project.ec:1798
 msgid "Target and object files deleted\n"
 msgstr "Target and object files deleted\n"
 
-#: ./src/debugger/Debugger.ec:2737
+#: ./src/debugger/Debugger.ec:2746
 msgid "Target doesn't contain debug information!\n"
 msgstr "Target doesn't contain debug information!\n"
 
@@ -1845,11 +1849,11 @@ msgstr "Text files (*.txt)"
 msgid "Text files (*.txt, *.text, *.nfo, *.info)"
 msgstr "Text files (*.txt, *.text, *.nfo, *.info)"
 
-#: ./src/designer/CodeEditor.ec:1380
+#: ./src/designer/CodeEditor.ec:1379
 msgid "The "
 msgstr "The "
 
-#: ./src/designer/CodeEditor.ec:2192
+#: ./src/designer/CodeEditor.ec:2191
 #: ./src/ide.ec:1518
 msgid "The document %s was modified by another application.\nWould you like to reload it and lose your changes?"
 msgstr "The document %s was modified by another application.\nWould you like to reload it and lose your changes?"
@@ -1858,32 +1862,32 @@ msgstr "The document %s was modified by another application.\nWould you like to 
 msgid "The following file"
 msgstr "The following file"
 
-#: ./src/project/Workspace.ec:1151
+#: ./src/project/Workspace.ec:1161
 msgid "The following file%s could not be re-opened.%s"
 msgstr "The following file%s could not be re-opened.%s"
 
-#: ./src/debugger/Debugger.ec:861
+#: ./src/debugger/Debugger.ec:864
 msgid "The program %s has exited (gdb provided an unknown reason)%s.\n"
 msgstr "The program %s has exited (gdb provided an unknown reason)%s.\n"
 
-#: ./src/debugger/Debugger.ec:855
+#: ./src/debugger/Debugger.ec:858
 msgid "The program %s has exited normally%s.\n"
 msgstr "The program %s has exited normally%s.\n"
 
-#: ./src/debugger/Debugger.ec:859
+#: ./src/debugger/Debugger.ec:862
 msgid "The program %s has exited with a signal%s.\n"
 msgstr "The program %s has exited with a signal%s.\n"
 
-#: ./src/debugger/Debugger.ec:853
-#: ./src/debugger/Debugger.ec:857
+#: ./src/debugger/Debugger.ec:856
+#: ./src/debugger/Debugger.ec:860
 msgid "The program %s has exited%s.\n"
 msgstr "The program %s has exited%s.\n"
 
-#: ./src/project/Project.ec:798
+#: ./src/project/Project.ec:823
 msgid "The project %s was modified by another application.\nWould you like to reload it and lose your changes?"
 msgstr "The project %s was modified by another application.\nWould you like to reload it and lose your changes?"
 
-#: ./src/debugger/Debugger.ec:1118
+#: ./src/debugger/Debugger.ec:1121
 msgid "This is the project directory.\nWould you like to try again?"
 msgstr "This is the project directory.\nWould you like to try again?"
 
@@ -1891,7 +1895,7 @@ msgstr "This is the project directory.\nWould you like to try again?"
 msgid "This project is already present in workspace."
 msgstr "This project is already present in workspace."
 
-#: ./src/debugger/Debugger.ec:1134
+#: ./src/debugger/Debugger.ec:1137
 msgid "This source directory is already specified.\nWould you like to try again?"
 msgstr "This source directory is already specified.\nWould you like to try again?"
 
@@ -1911,7 +1915,7 @@ msgstr "Tile Vertically"
 msgid "Tiny C Compiler / GNU Make"
 msgstr "Tiny C Compiler / GNU Make"
 
-#: ./src/designer/CodeEditor.ec:1927
+#: ./src/designer/CodeEditor.ec:1926
 msgid "Toggle Breakpoint"
 msgstr "Toggle Breakpoint"
 
@@ -1935,7 +1939,7 @@ msgstr "Tree:"
 msgid "Type"
 msgstr "Type"
 
-#: ./src/debugger/Debugger.ec:1147
+#: ./src/debugger/Debugger.ec:1150
 msgid "Unable to locate source file.\nWould you like to try again?"
 msgstr "Unable to locate source file.\nWould you like to try again?"
 
@@ -1944,20 +1948,20 @@ msgstr "Unable to locate source file.\nWould you like to try again?"
 msgid "Unable to open file %s\n\n"
 msgstr "Unable to open file %s\n\n"
 
-#: ./src/debugger/Debugger.ec:2302
+#: ./src/debugger/Debugger.ec:2309
 msgid "Unknown error for \"%s\""
 msgstr "Unknown error for \"%s\""
 
-#: ./src/debugger/Debugger.ec:3394
+#: ./src/debugger/Debugger.ec:3403
 msgid "Unknown output"
 msgstr "Unknown output"
 
-#: ./src/debugger/Debugger.ec:3372
+#: ./src/debugger/Debugger.ec:3381
 msgid "Unknown prompt"
 msgstr "Unknown prompt"
 
 #: ./src/project/ProjectView.ec:1078
-#: ./src/designer/CodeEditor.ec:2417
+#: ./src/designer/CodeEditor.ec:2416
 msgid "Untitled %d"
 msgstr "Untitled %d"
 
@@ -2038,7 +2042,7 @@ msgid "With contributions from..."
 msgstr "With contributions from..."
 
 #: ./src/dialogs/FindInFilesDialog.ec:441
-#: ./src/dialogs/GlobalSettingsDialog.ec:1103
+#: ./src/dialogs/GlobalSettingsDialog.ec:1122
 #: ./src/dialogs/WorkspaceSettings.ec:6
 msgid "Workspace"
 msgstr "Workspace"
@@ -2047,11 +2051,11 @@ msgstr "Workspace"
 msgid "Workspace Files (*.ews)"
 msgstr "Workspace Files (*.ews)"
 
-#: ./src/project/Workspace.ec:1118
+#: ./src/project/Workspace.ec:1128
 msgid "Workspace Load File Error"
 msgstr "Workspace Load File Error"
 
-#: ./src/project/Workspace.ec:1118
+#: ./src/project/Workspace.ec:1128
 msgid "Workspace load file failed"
 msgstr "Workspace load file failed"
 
@@ -2067,7 +2071,7 @@ msgstr "Would you like to save changes made to the project options?"
 msgid "Would you like to save changes made to the workspace options?"
 msgstr "Would you like to save changes made to the workspace options?"
 
-#: ./src/project/Project.ec:1440
+#: ./src/project/Project.ec:1475
 msgid "Writing symbol loader...\n"
 msgstr "Writing symbol loader...\n"
 
@@ -2075,11 +2079,11 @@ msgstr "Writing symbol loader...\n"
 msgid "You have modified projects.\nSave changes to "
 msgstr "You have modified projects.\nSave changes to "
 
-#: ./src/debugger/Debugger.ec:1257
+#: ./src/debugger/Debugger.ec:1261
 msgid "You must provide a source directory in order to place a breakpoint in this file.\nWould you like to try again?"
 msgstr "You must provide a source directory in order to place a breakpoint in this file.\nWould you like to try again?"
 
-#: ./src/debugger/Debugger.ec:1252
+#: ./src/debugger/Debugger.ec:1256
 msgid "You must provide a valid source directory in order to place a breakpoint in this file.\nWould you like to try again?"
 msgstr "You must provide a valid source directory in order to place a breakpoint in this file.\nWould you like to try again?"
 
@@ -2087,8 +2091,8 @@ msgstr "You must provide a valid source directory in order to place a breakpoint
 msgid "You must specify a search location."
 msgstr "You must specify a search location."
 
-#: ./src/project/Project.ec:1292
-#: ./src/project/Project.ec:1554
+#: ./src/project/Project.ec:1327
+#: ./src/project/Project.ec:1589
 msgid "\nBuild cancelled by user.\n"
 msgstr "\nBuild cancelled by user.\n"
 
@@ -2124,19 +2128,19 @@ msgstr "eC/C/C++ Files (*.ec, *.eh, *.c, *.cpp, *.cc, *.cxx, *.h, *.hpp, *.hh, *
 msgid "eC/C/C++ Source Files (*.ec, *.c, *.cpp, *.cc, *.cxx)"
 msgstr "eC/C/C++ Source Files (*.ec, *.c, *.cpp, *.cc, *.cxx)"
 
-#: ./src/debugger/Debugger.ec:3538
+#: ./src/debugger/Debugger.ec:3547
 msgid "err: Unable to create FIFO %s\n"
 msgstr "err: Unable to create FIFO %s\n"
 
-#: ./src/debugger/Debugger.ec:3539
+#: ./src/debugger/Debugger.ec:3548
 msgid "err: Unable to open FIFO %s for read\n"
 msgstr "err: Unable to open FIFO %s for read\n"
 
-#: ./src/project/Project.ec:1569
+#: ./src/project/Project.ec:1604
 msgid "error"
 msgstr "error"
 
-#: ./src/project/Project.ec:1569
+#: ./src/project/Project.ec:1604
 msgid "errors"
 msgstr "errors"
 
@@ -2150,15 +2154,15 @@ msgstr "es"
 msgid "found"
 msgstr "found"
 
-#: ./src/debugger/Debugger.ec:2891
+#: ./src/debugger/Debugger.ec:2900
 msgid "inside %s, %s\n"
 msgstr "inside %s, %s\n"
 
-#: ./src/project/Project.ec:1571
+#: ./src/project/Project.ec:1606
 msgid "no error, "
 msgstr "no error, "
 
-#: ./src/project/Project.ec:1576
+#: ./src/project/Project.ec:1611
 msgid "no warning\n"
 msgstr "no warning\n"
 
@@ -2179,15 +2183,15 @@ msgstr "s"
 msgid "s were "
 msgstr "s were "
 
-#: ./src/debugger/Debugger.ec:2897
+#: ./src/debugger/Debugger.ec:2906
 msgid "unknown source\n"
 msgstr "unknown source\n"
 
-#: ./src/project/Project.ec:1574
+#: ./src/project/Project.ec:1609
 msgid "warning"
 msgstr "warning"
 
-#: ./src/project/Project.ec:1574
+#: ./src/project/Project.ec:1609
 msgid "warnings"
 msgstr "warnings"
 
