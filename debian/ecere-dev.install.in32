@@ -1,7 +1,7 @@
 usr/bin
-usr/lib/libecereVanilla.a
-usr/lib/libecereCOM.so
-usr/lib/libecere.so
+usr/i386-linux-gnu/lib/libecereVanilla.a
+usr/i386-linux-gnu/lib/libecereCOM.so
+usr/i386-linux-gnu/lib/libecere.so
 usr/share/applications
 usr/share/pixmaps
 usr/share/man

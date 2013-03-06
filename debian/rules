@@ -9,13 +9,10 @@ prefix=/usr
 endif
 
 ifeq ($(DEB_HOST_ARCH),amd64)
-export LIBDIR=$(prefix)/lib32
+export LIBDIR=$(prefix)/lib/x86_64-linux-gnu
 else
-export LIBDIR=$(prefix)/lib
+export LIBDIR=$(prefix)/lib/i386-linux-gnu
 endif
-
-export CPPFLAGS
-CPPFLAGS += -DDEB_HOST_MULTIARCH=\"$(LIBDIR)\"
 
 %:
 	dh $@
